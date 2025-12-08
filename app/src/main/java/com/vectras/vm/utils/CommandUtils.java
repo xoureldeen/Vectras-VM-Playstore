@@ -1,9 +1,16 @@
 package com.vectras.vm.utils;
 
+
 import android.app.Activity;
+import android.content.Context;
+import android.util.Log;
 
 import com.vectras.vm.VectrasApp;
 import com.vectras.vterm.Terminal;
+import com.vectras.nativeQemu.processManager;
+import com.vectras.nativeQemu.assetsManager;
+
+import java.io.File;
 
 public class CommandUtils {
     public static String createForSelectedMirror(boolean _https, String _url, String _beforemain) {
@@ -22,14 +29,37 @@ public class CommandUtils {
     }
 
     public static String getQemuVersionName() {
-        String qemuVersion = getQemuVersion();
-
-        if (qemuVersion.toLowerCase().contains("failed")) return "";
-
-        return (qemuVersion.contains("Error") ? qemuVersion.substring(0, qemuVersion.indexOf("Error")) : qemuVersion) + (is3dfxVersion() ? " - 3dfx" : "");
+        return getQemuVersion() + (is3dfxVersion() ? " - 3dfx" : "");
     }
 
     public static String getQemuVersion() {
+        //processManager manager = null;
+        // test here
+        Context context = VectrasApp.getContext();
+        try {
+            assetsManager.installQemuAll(context);
+
+            // Resolve the native qemu-system-x86_64 path
+            File binDir = assetsManager.getQemuPath(context);
+            File qemu = new File(binDir, "qemu-system-ppc");
+
+            String[] cmd = {
+                    qemu.getAbsolutePath(),
+                    "--version"
+            };
+
+            processManager.ProcessResult result =
+                    processManager.runNativeCommand(cmd);
+
+            Log.d("QEMU", "aaaExit code: " + result.exitCode);
+            Log.d("QEMU", "aaaSTDOUT:\n" + result.stdout);
+            Log.d("QEMU", "aaaSTDERR:\n" + result.stderr);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
         return VectrasApp.getContext() == null ? "Unknow" : Terminal.executeShellCommandWithResult("qemu-system-x86_64 --version | head -n1 | awk '{print $4}'", VectrasApp.getContext()).replaceAll("\n", "");
     }
 
