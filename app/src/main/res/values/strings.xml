@@ -4,7 +4,7 @@
 
     <!--======================VECTRAS STRINGS====================-->
     <string name="app_version" translatable="false">3.4.1</string>
-    <string name="qemu_version" translatable="false">Stable</string>
+    <string name="qemu_version" translatable="false">Native</string>
     <!-- logger -->
     <string name="startvm">VM STARTED!</string>
     <string name="stopvm">VM STOPPED!</string>

@@ -152,7 +152,7 @@ public final class BackgroundJob {
         environment.add("LANG=en_US.UTF-8");
         //environment.add("PATH=" + TermuxService.PREFIX_PATH + "/bin");
         environment.add("PWD=" + cwd);
-        environment.add("TMPDIR=/tmp");
+        environment.add("TMPDIR=/data/data/com.vectras.vm/files/qemu/tmp");
         environment.add("BOOTCLASSPATH=" + System.getenv("BOOTCLASSPATH"));
         environment.add("ANDROID_ROOT=" + System.getenv("ANDROID_ROOT"));
         environment.add("ANDROID_DATA=" + System.getenv("ANDROID_DATA"));

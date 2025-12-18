@@ -1,7 +1,6 @@
 package com.vectras.vm.home.core;
 
 import static android.os.Build.VERSION.SDK_INT;
-import static com.vectras.vm.utils.LibraryChecker.isPackageInstalled2;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -66,18 +65,7 @@ public class DisplaySystem {
             String necessaryPackage = "fluxbox";
 
             // Check if XFCE4 is installed
-            isPackageInstalled2(activity, necessaryPackage, (output, errors) -> {
                 boolean isInstalled = false;
-
-                // Check if the package exists in the installed packages output
-                if (output != null) {
-                    Set<String> installedPackages = new HashSet<>();
-                    for (String installedPackage : output.split("\n")) {
-                        installedPackages.add(installedPackage.trim());
-                    }
-
-                    isInstalled = installedPackages.contains(necessaryPackage.trim());
-                }
 
                 // If not installed, show a dialog to install it
                 if (!isInstalled) {
@@ -118,14 +106,13 @@ public class DisplaySystem {
                         new Terminal(activity).executeShellCommand2("killall fluxbox", false, activity);
                     new Terminal(activity).executeShellCommand2(SDK_INT >= 34 ? "export DISPLAY=:0 && sleep 5 && fluxbox" : "fluxbox", false, activity);
                 }
-            });
         }
     }
 
-    public static void startTermuxX11() {
-        if (Build.VERSION.SDK_INT < 34) {
-            ShellExecutor shellExec = new ShellExecutor();
-            shellExec.exec(TermuxService.PREFIX_PATH + "/bin/termux-x11 :0");
-        }
-    }
+//    public static void startTermuxX11() {
+//        if (Build.VERSION.SDK_INT < 34) {
+//            ShellExecutor shellExec = new ShellExecutor(context);
+//            shellExec.exec(TermuxService.PREFIX_PATH + "/bin/termux-x11 :0");
+//        }
+//    }
 }

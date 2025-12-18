@@ -43,6 +43,9 @@ public class StartVM {
             params.add("-qmp");
             params.add("unix:" + Config.getLocalQMPSocketPath() + ",server,nowait");
 
+            params.add("-L");
+            params.add(activity.getFilesDir().getPath() + "/qemu/pc-bios");
+
             String ifType;
             ifType= MainSettingsManager.getIfType(activity);
 
@@ -185,8 +188,8 @@ public class StartVM {
                     bios += " -drive ";
                     bios += "file=" + AppConfig.basefiledir + "RELEASEX64_OVMF_VARS.fd,format=raw,if=pflash";
                 } else {
-                    bios = "-bios ";
-                    bios += AppConfig.basefiledir + "bios-vectras.bin";
+//                    bios = "-bios ";
+//                    bios += AppConfig.basefiledir + "bios-vectras.bin";
                 }
             }
 

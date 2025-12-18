@@ -14,6 +14,7 @@
             android:key="updateVersionPrompt"
             android:summary="@string/check_on_startup"
             android:title="@string/automatically_check_for_updates"
+            app:isPreferenceVisible="false"
             app:icon="@drawable/round_update_24" />
 
         <SwitchPreferenceCompat
@@ -24,6 +25,7 @@
             android:key="checkforupdatesfromthebetachannel"
             android:summary="@string/you_will_receive_updates_to_experience_the_latest_features_early"
             android:title="@string/join_the_beta_channel"
+            app:isPreferenceVisible="false"
             app:icon="@drawable/science_24px" />
 
         <SwitchPreferenceCompat
@@ -60,6 +62,7 @@
             android:key="checkforupdate"
             android:title="@string/check_for_updates"
             android:summary="@string/see_if_there_are_any_new_updates"
+            app:isPreferenceVisible="false"
             app:icon="@drawable/system_update_24px">
             <intent
                 android:targetPackage="com.vectras.vm"

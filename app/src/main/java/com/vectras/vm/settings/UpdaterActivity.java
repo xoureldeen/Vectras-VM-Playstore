@@ -136,11 +136,11 @@ public class UpdaterActivity extends AppCompatActivity {
                                     R.drawable.science_24px,
                                     true,
                                     () -> {
-                                        MainSettingsManager.setcheckforupdatesfromthebetachannel(activity, true);
+                                        MainSettingsManager.setcheckforupdatesfromthebetachannel(activity, false);
                                         checkAgain();
                                     },
                                     null,
-                                    () -> MainSettingsManager.setDontShowAgainJoinBetaUpdateChannelDialog(activity, true),
+                                    () -> MainSettingsManager.setDontShowAgainJoinBetaUpdateChannelDialog(activity, false),
                                     null);
                         }
                     } catch (JSONException e) {

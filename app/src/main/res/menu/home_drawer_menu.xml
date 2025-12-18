@@ -27,11 +27,13 @@
     <item
         android:id="@+id/navigation_item_desktop"
         android:icon="@drawable/desktop_24px"
-        android:title="@string/X11_display"/>
+        android:title="@string/X11_display"
+        android:visible="false"/>
     <item
         android:id="@+id/navigation_item_terminal"
         android:icon="@drawable/terminal_24px"
-        android:title="@string/terminal"/>
+        android:title="@string/terminal"
+        android:visible="false"/>
     <item
         android:id="@+id/navigation_item_view_logs"
         android:icon="@drawable/overview_24px"
@@ -43,7 +45,8 @@
     <item
         android:id="@+id/mini_tools"
         android:icon="@drawable/home_repair_service_24px"
-        android:title="@string/mini_tools"/>
+        android:title="@string/mini_tools"
+        android:visible="false"/>
     <item
         android:id="@+id/navigation_data_explorer"
         android:icon="@drawable/folder_24px"

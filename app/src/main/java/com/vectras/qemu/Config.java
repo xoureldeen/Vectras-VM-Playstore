@@ -167,7 +167,7 @@ public class Config {
     public static String hd_if_type = "ide";
 
     //Change to true in prod if you want to be notified by default for new versions
-    public static boolean defaultCheckNewVersion = true;
+    public static boolean defaultCheckNewVersion = false;
 
     // App config
     public static final String datadirpath = VectrasApp.getApp().getExternalFilesDir("data")+"/";

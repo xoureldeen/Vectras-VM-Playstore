@@ -35,7 +35,7 @@
             android:id="@+id/ln_all_options"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="108dp"
+            android:paddingTop="16dp"
             android:paddingHorizontal="16dp"
             android:paddingBottom="16dp"
             android:orientation="vertical"
@@ -79,8 +79,7 @@
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:clickable="false"/>
+                    app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -150,6 +149,7 @@
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:background="?attr/colorSurfaceContainerLow"
+        android:visibility="gone"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <com.google.android.material.card.MaterialCardView
@@ -158,6 +158,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:backgroundTint="?attr/colorSecondaryContainer"
+        android:visibility="gone"
         app:cardCornerRadius="50dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -169,7 +170,7 @@
             android:gravity="center_vertical"
             android:paddingVertical="16dp"
             android:paddingLeft="32dp"
-            android:paddingRight="20dp" >
+            android:paddingRight="20dp">
 
             <TextView
                 android:layout_width="0dp"
@@ -184,8 +185,9 @@
                 android:id="@+id/sw_enabled"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?attr/colorAccent"
-                android:clickable="false"/>
+                android:checked="true"
+                android:clickable="false"
+                android:textColor="?attr/colorAccent" />
 
         </LinearLayout>
 

@@ -36,7 +36,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.color.MaterialColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.termux.app.TermuxActivity;
+import com.vectras.nativeQemu.assetsManager;
 import com.vectras.qemu.Config;
 import com.vectras.qemu.MainSettingsManager;
 import com.vectras.vm.AboutActivity;
@@ -69,7 +69,6 @@ import com.vectras.vm.settings.UpdaterActivity;
 import com.vectras.vm.utils.DeviceUtils;
 import com.vectras.vm.utils.DialogUtils;
 import com.vectras.vm.utils.FileUtils;
-import com.vectras.vm.utils.LibraryChecker;
 import com.vectras.vm.utils.NotificationUtils;
 import com.vectras.vm.utils.PackageUtils;
 import com.vectras.vm.utils.UIUtils;
@@ -265,15 +264,15 @@ public class HomeActivity extends AppCompatActivity implements RomStoreFragment.
                     }
                 });
 
-        new
-
-                LibraryChecker(this).
-
-                checkMissingLibraries(this);
-
         setupDrawer();
-        DisplaySystem.startTermuxX11();
-        DialogUtils.joinTelegram(this);
+
+        try {
+            assetsManager.installQemuAll(this);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        //DialogUtils.joinTelegram(this);
         NotificationUtils.clearAll(this);
 
         if (MainSettingsManager.getPromptUpdateVersion(this))
@@ -513,7 +512,9 @@ public class HomeActivity extends AppCompatActivity implements RomStoreFragment.
                 DisplaySystem.launchX11(this, true);
             } else if (id == R.id.navigation_item_terminal) {
                 if (DeviceUtils.is64bit()) {
-                    startActivity(new Intent(this, TermuxActivity.class));
+                    //startActivity(new Intent(this, TermuxActivity.class));
+                    com.vectras.vterm.TerminalBottomSheetDialog VTERM = new com.vectras.vterm.TerminalBottomSheetDialog(this);
+                    VTERM.showVterm();
                 } else {
                     com.vectras.vterm.TerminalBottomSheetDialog VTERM = new com.vectras.vterm.TerminalBottomSheetDialog(this);
                     VTERM.showVterm();

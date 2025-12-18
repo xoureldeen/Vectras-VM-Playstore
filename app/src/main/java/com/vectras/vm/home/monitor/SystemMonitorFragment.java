@@ -4,14 +4,10 @@ import static android.content.Context.ACTIVITY_SERVICE;
 import static android.os.Build.VERSION.SDK_INT;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -20,6 +16,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.transition.MaterialFadeThrough;
 import com.vectras.qemu.Config;
@@ -147,6 +147,7 @@ public class SystemMonitorFragment extends Fragment {
 
     @SuppressLint("SetTextI18n")
     private void updateSystemMonitor() {
+        if (!isAdded()) return;
         ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
         ActivityManager activityManager = (ActivityManager) requireActivity().getSystemService(ACTIVITY_SERVICE);
         activityManager.getMemoryInfo(mi);
@@ -187,48 +188,56 @@ public class SystemMonitorFragment extends Fragment {
 
     @SuppressLint("SetTextI18n")
     private void getQemuInfo() {
+        if (!isAdded()) return;
         String currentArch = MainSettingsManager.getArch(requireActivity());
 
         binding.tvQemuarch.setText(getString(R.string.arch) + " " + currentArch + ".");
 
         executor.execute(() -> {
+            if (!isAdded()) return;
             String qemuVersionName = CommandUtils.getQemuVersionName();
-            String result = Terminal.executeShellCommandWithResult("ps -e command", requireActivity());
-            requireActivity().runOnUiThread(() -> {
-                binding.tvProcesses.setText(result);
-                binding.tvQemuversion.setText(getString(R.string.version) + " " + (qemuVersionName.isEmpty() ? getString(R.string.unknow) : qemuVersionName) + ".");
+            String result = Terminal.executeShellCommandWithResult("ps -e command", requireContext());
+            Activity activity = getActivity();
+            if (activity != null) {
+                activity.runOnUiThread(() -> {
+                    if (!isAdded()) return;
+                    binding.tvProcesses.setText(result);
+                    binding.tvQemuversion.setText(getString(R.string.version) + " " + (qemuVersionName.isEmpty() ? getString(R.string.unknow) : qemuVersionName) + ".");
 
-                if (!result.isEmpty()) {
-                    switch (currentArch) {
-                        case "X86_64" ->
-                                binding.tvQemustatus.setText(getString(R.string.status_qemu) + " " + (result.contains("qemu-system-x86_64 -qmp") ? getString(R.string.running) : getString(R.string.stopped)) + ".");
-                        case "I386" ->
-                                binding.tvQemustatus.setText(getString(R.string.status_qemu) + " " + (result.contains("qemu-system-i386 -qmp") ? getString(R.string.running) : getString(R.string.stopped)) + ".");
-                        case "ARM64" ->
-                                binding.tvQemustatus.setText(getString(R.string.status_qemu) + " " + (result.contains("qemu-system-aarch64 -qmp") ? getString(R.string.running) : getString(R.string.stopped)) + ".");
-                        case "PPC" ->
-                                binding.tvQemustatus.setText(getString(R.string.status_qemu) + " " + (result.contains("qemu-system-ppc -qmp") ? getString(R.string.running) : getString(R.string.stopped)) + ".");
-                        default -> binding.tvQemustatus.setText(getString(R.string.status_qemu) + " " + getString(R.string.stopped) + ".");
-                    }
+                    if (!result.isEmpty()) {
+                        switch (currentArch) {
+                            case "X86_64" ->
+                                    binding.tvQemustatus.setText(getString(R.string.status_qemu) + " " + (result.contains("qemu-system-x86_64 -qmp") ? getString(R.string.running) : getString(R.string.stopped)) + ".");
+                            case "I386" ->
+                                    binding.tvQemustatus.setText(getString(R.string.status_qemu) + " " + (result.contains("qemu-system-i386 -qmp") ? getString(R.string.running) : getString(R.string.stopped)) + ".");
+                            case "ARM64" ->
+                                    binding.tvQemustatus.setText(getString(R.string.status_qemu) + " " + (result.contains("qemu-system-aarch64 -qmp") ? getString(R.string.running) : getString(R.string.stopped)) + ".");
+                            case "PPC" ->
+                                    binding.tvQemustatus.setText(getString(R.string.status_qemu) + " " + (result.contains("qemu-system-ppc -qmp") ? getString(R.string.running) : getString(R.string.stopped)) + ".");
+                            default ->
+                                    binding.tvQemustatus.setText(getString(R.string.status_qemu) + " " + getString(R.string.stopped) + ".");
+                        }
 
-                    if (result.contains("qemu-system") && result.contains("-qmp")) {
-                        binding.btStopqemu.setVisibility(View.VISIBLE);
+                        if (result.contains("qemu-system") && result.contains("-qmp")) {
+                            binding.btStopqemu.setVisibility(View.VISIBLE);
+                        } else {
+                            binding.btStopqemu.setVisibility(View.GONE);
+                        }
                     } else {
+                        binding.tvQemustatus.setText(getString(R.string.status_qemu) + " " + getString(R.string.stopped) + ".");
                         binding.btStopqemu.setVisibility(View.GONE);
+                        Log.i(TAG, "Errors: " + result);
                     }
-                } else {
-                    binding.tvQemustatus.setText(getString(R.string.status_qemu) + " " + getString(R.string.stopped) + ".");
-                    binding.btStopqemu.setVisibility(View.GONE);
-                    Log.i(TAG, "Errors: " + result);
-                }
 
-                getVNCServerStatus(result);
-            });
+                    getVNCServerStatus(result);
+                });
+            }
         });
     }
 
     @SuppressLint("SetTextI18n")
     private void getVNCServerStatus(String resultCommand) {
+        if (!isAdded()) return;
         binding.tvVncport.setText(getString(R.string.port_qemu) + " " + (Integer.parseInt(MainSettingsManager.getVncExternalDisplay(requireActivity())) + 5900) + ".");
 
         if (resultCommand.contains(Config.defaultVNCHost + ":" + Config.defaultVNCPort)) {

@@ -10,7 +10,6 @@ import com.termux.app.TermuxService;
 
 import static com.vectras.vm.VMManager.startFixRomsDataJson;
 import static com.vectras.vm.VectrasApp.getApp;
-import static com.vectras.vm.utils.LibraryChecker.isPackageInstalled2;
 import static com.vectras.vm.utils.UIUtils.UIAlert;
 
 import com.vectras.vm.settings.UpdaterActivity;
@@ -78,7 +77,6 @@ import com.vectras.vm.MainRoms.DataMainRoms;
 import com.vectras.vm.adapter.LogsAdapter;
 import com.vectras.vm.logger.VectrasStatus;
 import com.vectras.vm.utils.FileUtils;
-import com.vectras.vm.utils.LibraryChecker;
 import com.vectras.vm.utils.PackageUtils;
 import com.vectras.vm.utils.ServiceUtils;
 import com.vectras.vterm.Terminal;
@@ -143,8 +141,6 @@ public class MainActivity extends AppCompatActivity {
 
         NotificationManager notificationManager = (NotificationManager) activity.getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancelAll();
-
-        new LibraryChecker(activity).checkMissingLibraries(activity);
 
         romsLayout = findViewById(R.id.romsLayout);
 
@@ -551,28 +547,16 @@ public class MainActivity extends AppCompatActivity {
                     }
                 };
         _timer.scheduleAtFixedRate(t, (int) (0), (int) (1000));
-        ShellExecutor shellExec = new ShellExecutor();
-        shellExec.exec(TermuxService.PREFIX_PATH + "/bin/termux-x11 :0");
 
         TextView qemuVersion = findViewById(R.id.qemuVersion);
 
         setupBottomAppBar();
 
-        if (MainSettingsManager.getPromptUpdateVersion(activity))
-            updateApp();
+//        if (MainSettingsManager.getPromptUpdateVersion(activity))
+//            updateApp();
 
         String command = "qemu-system-x86_64 --version";
-        new Terminal(activity).extractQemuVersion(command, false, activity, (output, errors) -> {
-            if (errors.isEmpty()) {
-                String versionStr = "Unknown";
-                if (output.equals("8.2.1"))
-                    versionStr = output + " - 3dfx";
-                Log.d(TAG, "QEMU Version: " + versionStr);
-                qemuVersion.setText(versionStr);
-            } else {
-                Log.e(TAG, "Errors: " + errors);
-            }
-        });
+
     }
 
     @Override
@@ -760,10 +744,7 @@ public class MainActivity extends AppCompatActivity {
             alertDialog.show();
         } else if (id == R.id.backtothedisplay) {
             if (VMManager.isQemuRunning(activity)) {
-                if (MainSettingsManager.getVmUi(activity).equals("VNC"))
-                    activity.startActivity(new Intent(activity, MainVNCActivity.class));
-                else if (MainSettingsManager.getVmUi(activity).equals("X11"))
-                    launchX11(false);
+                activity.startActivity(new Intent(activity, MainVNCActivity.class));
             } else {
                 Toast.makeText(getApplicationContext(), activity.getResources().getString(R.string.there_is_nothing_here_because_there_is_no_vm_running), Toast.LENGTH_LONG).show();
             }
@@ -1242,20 +1223,8 @@ public class MainActivity extends AppCompatActivity {
             // XFCE4 meta-package
             String xfce4Package = "xfce4";
 
-            // Check if XFCE4 is installed
-            isPackageInstalled2(activity, xfce4Package, (output, errors) -> {
-                boolean isInstalled = false;
 
-                // Check if the package exists in the installed packages output
-                if (output != null) {
-                    Set<String> installedPackages = new HashSet<>();
-                    for (String installedPackage : output.split("\n")) {
-                        installedPackages.add(installedPackage.trim());
-                    }
-
-                    isInstalled = installedPackages.contains(xfce4Package.trim());
-                }
-
+            boolean isInstalled = false;
                 // If not installed, show a dialog to install it
                 if (!isInstalled) {
                     DialogUtils.twoDialog(activity, "Install XFCE4", "XFCE4 is not installed. Would you like to install it?", getString(R.string.install), getString(R.string.cancel), true, R.drawable.desktop_24px, true,
@@ -1269,8 +1238,6 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(new Intent(activity, X11Activity.class));
                     new Terminal(activity).executeShellCommand2("xfce4-session", false, MainActivity.activity);
                 }
-            });
-
         }
     }
 

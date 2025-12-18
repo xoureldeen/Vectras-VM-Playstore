@@ -34,6 +34,7 @@
         android:fragment="com.vectras.vm.x11.LoriePreferences$LoriePreferenceFragment"
         android:title="@string/x11"
         android:summary="@string/x11_settings_description"
+        app:isPreferenceVisible="false"
         app:iconSpaceReserved="false" />
     <Preference
         android:key="importandexport"

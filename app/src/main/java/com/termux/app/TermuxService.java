@@ -301,7 +301,7 @@ public final class TermuxService extends Service implements SessionChangedCallba
 
             if (executablePath == null) {
                 // Fall back to system shell as last resort:
-                executablePath = TermuxService.PREFIX_PATH + "/bin/vectras-pd";
+                executablePath = "/system/bin/sh";
             }
             isLoginShell = true;
         }

@@ -14,21 +14,18 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.termux.app.TermuxService;
-import com.vectras.vm.AppConfig;
 import com.vectras.vm.R;
 import com.vectras.vterm.view.ZoomableTextView;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.Objects;
 
 public class TerminalBottomSheetDialog {
@@ -79,7 +76,7 @@ public class TerminalBottomSheetDialog {
             // If the event is a key-down event on the "enter" button
             if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                     (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                activity.runOnUiThread(() -> appendTextAndScroll(commandInput.getText().toString() + "\n"));
+                activity.runOnUiThread(() -> appendTextAndScroll("root@localhost:~$ " + commandInput.getText().toString() + "\n"));
                 executeShellCommand(commandInput.getText().toString());
                 commandInput.setText("");
                 // Request focus again
@@ -97,10 +94,9 @@ public class TerminalBottomSheetDialog {
     private void updateUserPrompt(TextView promptView) {
         // Run this in a separate thread to not block UI
         new Thread(() -> {
-            String username = null;
+            String username = "root"; // Hardcoded for simplicity as per the original
             // Update the prompt on the UI thread
-            String finalUsername = username != null ? username : "root";
-            activity.runOnUiThread(() -> promptView.setText(finalUsername + "@localhost:~$ "));
+            activity.runOnUiThread(() -> promptView.setText(username + "@localhost:~$ "));
         }).start();
     }
 
@@ -150,84 +146,46 @@ public class TerminalBottomSheetDialog {
             new Thread(() -> {
                 try {
                     activity.runOnUiThread(() -> {
-                        if (terminalOutput.getVisibility() == View.GONE) terminalOutput.setVisibility(View.VISIBLE);
-                        appendTextAndScroll("root@localhost:~$ " + userCommand + "\n");
+                        if (terminalOutput.getVisibility() == View.GONE)
+                            terminalOutput.setVisibility(View.VISIBLE);
+                        // The prompt is now added in the key listener, so we don't need to add it here again.
                         inputContainer.setVisibility(View.GONE);
                     });
-                    // Setup the qemuProcess builder to start PRoot with environmental variables and commands
+                    // Setup the process builder to start a native shell process
                     ProcessBuilder processBuilder = new ProcessBuilder();
 
-                    // Adjust these environment variables as necessary for your app
-                    String filesDir = AppConfig.internalDataDirPath;
+                    // Define the command to be executed by the system's native shell
+                    String[] nativeCommand = {"/system/bin/sh", "-c", userCommand};
+                    processBuilder.command(nativeCommand);
 
-                    File tmpDir = new File(filesDir, "usr/tmp");
+                    // Set environment variables for the process
+                    Map<String, String> environment = processBuilder.environment();
+                    String qemuPath = activity.getFilesDir().getPath() + "/qemu";
+                    environment.put("LD_LIBRARY_PATH", qemuPath + "/libs");
+                    environment.put("PATH", qemuPath + "/bin:" + System.getenv("PATH"));
 
-                    // Setup environment for the PRoot qemuProcess
-                    processBuilder.environment().put("PROOT_TMP_DIR", tmpDir.getAbsolutePath());
+                    // Set the working directory for the process
+                    processBuilder.directory(activity.getFilesDir());
 
-                    processBuilder.environment().put("HOME", "/root");
-                    processBuilder.environment().put("USER", "root");
-                    //processBuilder.environment().put("PATH", "/bin:/usr/bin:/sbin:/usr/sbin");
-                    //processBuilder.environment().put("LD_LIBRARY_PATH", TermuxService.PREFIX_PATH + "/lib");
-                    processBuilder.environment().put("TERM", "xterm-256color");
-                    processBuilder.environment().put("TMPDIR", "/tmp");
-                    processBuilder.environment().put("SHELL", "/bin/sh");
-                    processBuilder.environment().put("DISPLAY", ":0");
-                    processBuilder.environment().put("PULSE_SERVER", "127.0.0.1");
-                    processBuilder.environment().put("XDG_RUNTIME_DIR", "${TMPDIR}");
-                    processBuilder.environment().put("SDL_VIDEODRIVER", "x11");
-
-                    String[] prootCommand = {
-                            TermuxService.PREFIX_PATH + "/bin/proot", // PRoot binary path
-                            "--kill-on-exit",
-                            "--link2symlink",
-                            "-0",
-                            "-r", filesDir + "/distro", // Path to the rootfs
-                            "-b", "/dev",
-                            "-b", "/proc",
-                            "-b", "/sys",
-                            "-b", AppConfig.internalDataDirPath + "distro/root:/dev/shm",
-                            "-b", "/sdcard",
-                            "-b", "/storage",
-                            "-b", "/data",
-                            "-b", AppConfig.internalDataDirPath + "usr/tmp:/tmp",
-                            "-w", "/root",
-                            "/bin/sh",
-                            "--login"// The shell to execute inside PRoot
-                    };
-
-                    processBuilder.command(prootCommand);
                     Process process = processBuilder.start();
+
                     // Get the input and output streams of the process
-                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
                     BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                     BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
-                    // Send user command to PRoot
-                    writer.write(userCommand);
-                    writer.newLine();
-                    writer.flush();
-                    writer.close();
+                    // This version doesn't write to stdin, so the writer is removed.
 
                     // Read the input stream for the output of the command
                     String line;
                     while ((line = reader.readLine()) != null) {
                         final String outputLine = line;
-                        activity.runOnUiThread(() -> {
-                            appendTextAndScroll(outputLine + "\n");
-                            inputContainer.setVisibility(View.VISIBLE);
-                            forcusCommandInput();
-                        });
+                        activity.runOnUiThread(() -> appendTextAndScroll(outputLine + "\n"));
                     }
 
                     // Read any errors from the error stream
                     while ((line = errorReader.readLine()) != null) {
                         final String errorLine = line;
-                        activity.runOnUiThread(() -> {
-                            appendTextAndScroll(errorLine + "\n");
-                            inputContainer.setVisibility(View.VISIBLE);
-                            forcusCommandInput();
-                        });
+                        activity.runOnUiThread(() -> appendTextAndScroll(errorLine + "\n"));
                     }
 
                     // Clean up
@@ -240,8 +198,10 @@ public class TerminalBottomSheetDialog {
                 } catch (IOException | InterruptedException e) {
                     // Handle exceptions by printing the stack trace in the terminal output
                     final String errorMessage = e.getMessage();
+                    activity.runOnUiThread(() -> appendTextAndScroll("Error: " + errorMessage + "\n"));
+                } finally {
+                    // Ensure the input container is visible and focused after execution
                     activity.runOnUiThread(() -> {
-                        appendTextAndScroll("Error: " + errorMessage + "n");
                         inputContainer.setVisibility(View.VISIBLE);
                         forcusCommandInput();
                     });
@@ -250,15 +210,17 @@ public class TerminalBottomSheetDialog {
         else
             new AlertDialog.Builder(activity, R.style.MainDialogTheme)
                     .setTitle("Error!")
-                    .setMessage("Verify that \"setupFiles()\" is working properly in onCreate().")
-                    .setCancelable(false)
+                    .setMessage("Installation not found. Verify that your setup process is working correctly.")
+                    .setCancelable(true) // Allow user to dismiss
+                    .setPositiveButton("OK", null)
                     .show();
     }
 
     private boolean checkInstallation() {
+        // A more robust check might be for the qemu directory itself
         String filesDir = activity.getFilesDir().getAbsolutePath();
-        File distro = new File(filesDir, "distro");
-        return distro.exists();
+        File qemuDir = new File(filesDir, "qemu");
+        return qemuDir.exists() && qemuDir.isDirectory();
     }
 
     private void forcusCommandInput() {

@@ -1,9 +1,11 @@
 package com.vectras.vm.core;
 
+import android.content.Context;
 import android.util.Log;
 import com.termux.app.TermuxService;
 import com.vectras.vm.logger.VectrasStatus;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,17 +19,19 @@ public class ShellExecutor {
     private Process shellExecutorProcess;
     private ExecutorService executorService;
     private Future<?> processFuture;
+    private final Context context;
 
-    public ShellExecutor() {
+    public ShellExecutor(Context context) {
+        this.context = context;
         this.executorService = Executors.newSingleThreadExecutor();
     }
 
     public void exec(String command) {
-        String logPath = "/sdcard/Documents/shell-executor.log";
+        File logFile = new File(context.getExternalFilesDir(null), "shell-executor.log");
         String shellPath = "/system/bin/sh";
 
         Runnable processRunnable = () -> {
-            try (FileWriter logWriter = new FileWriter(logPath, true)) {
+            try (FileWriter logWriter = new FileWriter(logFile, true)) {
                 shellExecutorProcess = new ProcessBuilder(shellPath).start();
                 OutputStream outputStream = shellExecutorProcess.getOutputStream();
 

@@ -47,7 +47,8 @@ public class HomeStartVM {
     public static String pendingVMID = "";
     public static String pendingThumbnailFile = "";
     public static boolean isLaunchFromPending = false;
-    public static String runCommandFormat = "export TMPDIR=/tmp && mkdir -p $TMPDIR/pulse && export XDG_RUNTIME_DIR=/tmp && chmod -R 775 $TMPDIR/pulse && pulseaudio --start --exit-idle-time=-1 > /dev/null 2>&1 && %s";
+    // Simplified runCommandFormat. The pulseaudio command has been removed for better stability and simplicity.
+    public static String runCommandFormat = "export TMPDIR=/data/data/com.vectras.vm/files/qemu/tmp && mkdir -p $TMPDIR && export XDG_RUNTIME_DIR=/tmp && %s";
 
     public static void startNow(
             Activity activity,
@@ -63,7 +64,6 @@ public class HomeStartVM {
             pendingVMID = "";
         } else {
             if (MainSettingsManager.getVmUi(activity).equals("X11")) {
-                runCommandFormat = String.format(runCommandFormat, "xterm -e bash -c '%s'");
                 if (SDK_INT < 34) {
                     pendingVMName = vmName;
                     pendingEnv = env;
@@ -174,12 +174,21 @@ public class HomeStartVM {
 
         VMManager.isQemuStopedWithError = false;
 
-        String finalCommand = VMManager.addAudioDevSdl(String.format(runCommandFormat, env));
-
-        if (MainSettingsManager.getVmUi(activity).equals("X11") && SDK_INT >= 34) {
-            finalCommand = "export DISPLAY=:0 && sleep 5\nfluxbox &\n" + finalCommand;
+        String wrappedCommand = env;
+        // Apply X11-specific wrappers only when needed
+        if (MainSettingsManager.getVmUi(activity).equals("X11")) {
+            if (SDK_INT >= 34) {
+                wrappedCommand = "export DISPLAY=:0 && sleep 5\nfluxbox &\n" + wrappedCommand;
+            } else {
+                // For older SDKs, wrap the command to be executed inside an xterm terminal.
+                wrappedCommand = String.format("xterm -e bash -c '%s'", wrappedCommand);
+            }
         }
-        Log.i(TAG, finalCommand);
+
+        // Add audio device and construct the final command
+        String finalCommand = VMManager.addAudioDevSdl(String.format(runCommandFormat, wrappedCommand));
+
+        Log.i(TAG, "Final Command: " + finalCommand);
 
         if (ServiceUtils.isServiceRunning(activity, MainService.class)) {
             MainService.startCommand(finalCommand, activity);
@@ -238,8 +247,6 @@ public class HomeStartVM {
             VectrasStatus.logInfo(i + ": " + params[i]);
             Log.d("HomeStartVM", i + ": " + params[i]);
         }
-
-        setDefault();
     }
 
     public static void startPending(Activity activity) {
@@ -286,6 +293,7 @@ public class HomeStartVM {
     }
 
     public static void setDefault() {
-        runCommandFormat = "export TMPDIR=/tmp && mkdir -p $TMPDIR/pulse && export XDG_RUNTIME_DIR=/tmp && chmod -R 775 $TMPDIR/pulse && pulseaudio --start --exit-idle-time=-1 > /dev/null 2>&1 && %s";
+        // This method is no longer needed as runCommandFormat is not modified dynamically.
+        // It can be left empty or removed if not used elsewhere.
     }
 }

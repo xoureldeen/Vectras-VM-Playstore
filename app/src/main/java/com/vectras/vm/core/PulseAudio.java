@@ -25,7 +25,7 @@ public class PulseAudio {
     }
 
     public void start() {
-        String tmpDir = TermuxService.PREFIX_PATH + "/tmp";
+        String tmpDir = "/data/data/com.vectras.vm/files/qemu/tmp";
 
         Runnable processRunnable = () -> {
             try {
