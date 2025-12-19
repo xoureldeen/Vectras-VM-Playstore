@@ -729,8 +729,9 @@ public class MainSettingsManager extends AppCompatActivity
     }
 
     public static boolean copyFile(Activity activity) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        return prefs.getBoolean("copyFile", true);
+        return true;
+//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+//        return prefs.getBoolean("copyFile", true);
     }
 
     public static void setIfType(Activity activity, String type) {

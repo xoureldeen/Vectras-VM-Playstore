@@ -41,6 +41,7 @@ public class SystemMonitorFragment extends Fragment {
     final String TAG = "SystemMonitorFragment";
     FragmentHomeSystemMonitorBinding binding;
     ExecutorService executor = Executors.newSingleThreadExecutor();
+    ScheduledExecutorService executorUpdate;
     boolean isStopUpdateMonitor = false;
 
     @Override
@@ -83,10 +84,18 @@ public class SystemMonitorFragment extends Fragment {
         stopMonitor();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (executorUpdate != null && !executorUpdate.isShutdown()) {
+            executorUpdate.shutdownNow();
+        }
+    }
+
     private void initialize() {
         binding.btStopqemu.setOnClickListener(v -> VMManager.requestKillAllQemuProcess(requireActivity(), () -> {
 
-            ScheduledExecutorService executorUpdate = Executors.newSingleThreadScheduledExecutor();
+            executorUpdate = Executors.newSingleThreadScheduledExecutor();
             executorUpdate.schedule(() -> {
                 if (getContext() != null) {
                     requireActivity().runOnUiThread(this::getQemuInfo);

@@ -1,25 +1,15 @@
 package com.vectras.vm;
 
-import static android.content.Intent.ACTION_VIEW;
 import static android.view.View.GONE;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.BaseAdapter;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
@@ -27,38 +17,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.termux.app.TermuxService;
-import com.vectras.qemu.MainSettingsManager;
-import com.vectras.vm.home.HomeActivity;
-import com.vectras.vm.setupwizard.SetupWizard2Activity;
-import com.vectras.vm.setupwizard.SetupWizardActivity;
-import com.vectras.vm.utils.CommandUtils;
 import com.vectras.vm.utils.DialogUtils;
 import com.vectras.vm.utils.FileUtils;
-import com.vectras.vm.utils.ListUtils;
-import com.vectras.vm.utils.PackageUtils;
 import com.vectras.vm.utils.UIUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Objects;
 
 public class Minitools extends AppCompatActivity {
     private final String TAG = "Minitools";
-    private final ArrayList<HashMap<String, String>> listmapForSelectMirrors = new ArrayList<>();
-    private Spinner spinnerselectmirror;
-    private String selectedMirrorCommand = "";
-
-    LinearLayout setupsoundfortermux;
     LinearLayout cleanup;
     LinearLayout restore;
     LinearLayout deleteallvm;
-    LinearLayout reinstallsystem;
     LinearLayout deleteall;
 
     @Override
@@ -74,38 +44,10 @@ public class Minitools extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         toolbar.setTitle(getString(R.string.mini_tools));
 
-        setupsoundfortermux = findViewById(R.id.setupsoundfortermux);
         cleanup = findViewById(R.id.cleanup);
         restore = findViewById(R.id.restore);
         deleteallvm = findViewById(R.id.deleteallvm);
-        reinstallsystem = findViewById(R.id.reinstallsystem);
         deleteall = findViewById(R.id.deleteall);
-        spinnerselectmirror = findViewById(R.id.spinnerselectmirror);
-
-        setupsoundfortermux.setOnClickListener(v -> {
-            if (PackageUtils.isInstalled("com.termux", getApplicationContext())) {
-                DialogUtils.twoDialog(Minitools.this, getString(R.string.setup_sound), getResources().getString(R.string.setup_sound_guide_content), getString(R.string.start_setup), getString(R.string.cancel), true, R.drawable.volume_up_24px, true,
-                        () -> {
-                            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                            ClipData clip = ClipData.newPlainText("Setup", "curl -o setup.sh https://raw.githubusercontent.com/AnBui2004/termux/refs/heads/main/installpulseaudio.sh && chmod +rwx setup.sh && ./setup.sh && rm setup.sh");
-                            clipboard.setPrimaryClip(clip);
-                            Intent intent = new Intent();
-                            intent.setAction(ACTION_VIEW);
-                            intent.setData(Uri.parse("android-app://com.termux"));
-                            startActivity(intent);
-                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.copied), Toast.LENGTH_LONG).show();
-                        }, null, null);
-            } else {
-                DialogUtils.twoDialog(Minitools.this, getString(R.string.termux_is_not_installed), getResources().getString(R.string.you_need_to_install_termux), getString(R.string.install), getString(R.string.cancel), true, R.drawable.arrow_downward_24px, true,
-                        () -> {
-                            Intent intent = new Intent();
-                            intent.setAction(ACTION_VIEW);
-                            intent.setData(Uri.parse("https://github.com/termux/termux-app/releases"));
-                            startActivity(intent);
-                        }, null, null);
-            }
-
-        });
 
         cleanup.setOnClickListener(v -> DialogUtils.twoDialog(Minitools.this, getResources().getString(R.string.clean_up), getResources().getString(R.string.clean_up_content), getResources().getString(R.string.clean_up), getResources().getString(R.string.cancel), true, R.drawable.cleaning_services_24px, true,
                 this::cleanUp, null, null));
@@ -122,25 +64,6 @@ public class Minitools extends AppCompatActivity {
 
         deleteall.setOnClickListener(v -> DialogUtils.twoDialog(Minitools.this, getResources().getString(R.string.delete_all), getResources().getString(R.string.delete_all_content), getResources().getString(R.string.delete_all), getResources().getString(R.string.cancel), true, R.drawable.delete_forever_24px, true,
                 this::eraserData, null, null));
-
-        reinstallsystem.setOnClickListener(v -> DialogUtils.twoDialog(Minitools.this, getResources().getString(R.string.reinstall_system), getResources().getString(R.string.reinstall_system_content), getResources().getString(R.string.continuetext), getResources().getString(R.string.cancel), true, R.drawable.system_update_24px, true,
-                this::eraserSystem, null, null));
-
-        spinnerselectmirror.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedMirrorCommand = listmapForSelectMirrors.get(position).get("mirror");
-                MainSettingsManager.setSelectedMirror(Minitools.this, position);
-                CommandUtils.run(selectedMirrorCommand + "&& exit", false, Minitools.this);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        setupSpiner();
     }
 
     @Override
@@ -154,52 +77,6 @@ public class Minitools extends AppCompatActivity {
             }
             default -> super.onOptionsItemSelected(item);
         };
-    }
-
-    private void setupSpiner() {
-        ListUtils.setupMirrorListForListmap(listmapForSelectMirrors);
-
-        spinnerselectmirror.setAdapter(new SpinnerSelectMirrorAdapter(listmapForSelectMirrors));
-        spinnerselectmirror.setSelection(MainSettingsManager.getSelectedMirror(Minitools.this));
-    }
-
-    public class SpinnerSelectMirrorAdapter extends BaseAdapter {
-
-        ArrayList<HashMap<String, String>> _data;
-
-        public SpinnerSelectMirrorAdapter(ArrayList<HashMap<String, String>> _arr) {
-            _data = _arr;
-        }
-
-        @Override
-        public int getCount() {
-            return _data.size();
-        }
-
-        @Override
-        public HashMap<String, String> getItem(int _index) {
-            return _data.get(_index);
-        }
-
-        @Override
-        public long getItemId(int _index) {
-            return _index;
-        }
-
-        @Override
-        public View getView(final int _position, View _v, ViewGroup _container) {
-            LayoutInflater _inflater = getLayoutInflater();
-            View _view = _v;
-            if (_view == null) {
-                _view = _inflater.inflate(R.layout.simple_layout_for_spiner, null);
-            }
-
-            final TextView textViewLocation = _view.findViewById(R.id.textViewLocation);
-
-            textViewLocation.setText(_data.get(_position).get("location"));
-
-            return _view;
-        }
     }
 
     private void cleanUp() {
@@ -279,59 +156,5 @@ public class Minitools extends AppCompatActivity {
                 Toast.makeText(this, getResources().getString(R.string.done), Toast.LENGTH_LONG).show();
             });
         }).start();
-    }
-
-    private void eraserSystem() {
-        View progressView = LayoutInflater.from(this).inflate(R.layout.dialog_progress_style, null);
-        TextView progress_text = progressView.findViewById(R.id.progress_text);
-        progress_text.setText(getString(R.string.just_a_moment));
-        AlertDialog progressDialog = new MaterialAlertDialogBuilder(this, R.style.CenteredDialogTheme)
-                .setView(progressView)
-                .setCancelable(false)
-                .create();
-        progressDialog.show();
-
-        new Thread(() -> {
-            HomeActivity.isActivate = false;
-            AppConfig.needreinstallsystem = true;
-            VMManager.killallqemuprocesses(this);
-            FileUtils.deleteDirectory(getFilesDir().getAbsolutePath() + "/data");
-            FileUtils.deleteDirectory(getFilesDir().getAbsolutePath() + "/distro");
-            FileUtils.deleteDirectory(getFilesDir().getAbsolutePath() + "/usr");
-
-            runOnUiThread(() -> {
-                progressDialog.dismiss();
-                Intent intent = new Intent();
-                intent.setClass(this, SetupWizard2Activity.class);
-                startActivity(intent);
-                finishAffinity();
-            });
-        }).start();
-    }
-
-    public void extractLoaderApk() {
-        String apkLoaderAssetPath = "bootstrap/loader.apk";
-        String apkLoaderextractedFilePath = TermuxService.PREFIX_PATH + "/libexec/termux-x11/loader.apk";
-
-        FileUtils.deleteDirectory(apkLoaderextractedFilePath);
-        if (copyAssetToFile(apkLoaderAssetPath, apkLoaderextractedFilePath)) {
-            FileUtils.copyAFile(TermuxService.PREFIX_PATH + "/libexec/termux-x11/loader.apk", AppConfig.maindirpath);
-        }
-    }
-
-    private boolean copyAssetToFile(String assetPath, String outputPath) {
-        try (InputStream in = getAssets().open(assetPath);
-             OutputStream out = new FileOutputStream(outputPath)) {
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = in.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
-            }
-            out.flush();
-            return true;
-        } catch (IOException e) {
-            Log.e(TAG, "copyAssetToFile: ", e);
-            return false;
-        }
     }
 }

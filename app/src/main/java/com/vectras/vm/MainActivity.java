@@ -230,159 +230,159 @@ public class MainActivity extends AppCompatActivity {
                 Intent w = new Intent(ACTION_VIEW);
                 w.setData(Uri.parse(tw));
                 startActivity(w);
-            } else if (id == R.id.navigation_item_import_iso) {
-                if (new File(AppConfig.maindirpath + "/drive.iso").exists()) {
-                    AlertDialog ad;
-                    ad = new AlertDialog.Builder(activity, R.style.MainDialogTheme).create();
-                    ad.setTitle("REPLACE ISO");
-                    ad.setMessage("there is iso imported you want to replace it?");
-                    ad.setButton(Dialog.BUTTON_POSITIVE, "REPLACE", (dialog, which) -> {
-                        Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
-                        intent.addCategory(Intent.CATEGORY_OPENABLE);
-                        intent.setType("*/*");
-
-                        // Optionally, specify a URI for the file that should appear in the
-                        // system file picker when it loads.
-                        if (SDK_INT >= Build.VERSION_CODES.O) {
-                            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Environment.DIRECTORY_DOWNLOADS);
-                        }
-
-                        startActivityForResult(intent, 1004);
-                    });
-                    ad.setButton(Dialog.BUTTON_NEGATIVE, "REMOVE", (dialog, which) -> {
-                        File isoFile = new File(AppConfig.maindirpath + "/drive.iso");
-                        try {
-                            if(!isoFile.delete()) Log.e(TAG, "Delete drive.iso failed!");
-                        } catch (Exception e) {
-                            Log.e(TAG, "Delete drive.iso: ", e);
-                        }
-                    });
-                    ad.show();
-                } else {
-                    Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("*/*");
-
-                    // Optionally, specify a URI for the file that should appear in the
-                    // system file picker when it loads.
-                    if (SDK_INT >= Build.VERSION_CODES.O) {
-                        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Environment.DIRECTORY_DOWNLOADS);
-                    }
-
-                    startActivityForResult(intent, 1004);
-                }
-            } else if (id == R.id.navigation_item_hdd1) {
-                if (new File(AppConfig.maindirpath + "/hdd1.qcow2").exists()) {
-                    AlertDialog ad;
-                    ad = new AlertDialog.Builder(activity, R.style.MainDialogTheme).create();
-                    ad.setTitle("REPLACE HDD1");
-                    ad.setMessage("there is hdd1 imported you want to replace it?");
-                    ad.setButton(Dialog.BUTTON_POSITIVE, "REPLACE", (dialog, which) -> {
-                        Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
-                        intent.addCategory(Intent.CATEGORY_OPENABLE);
-                        intent.setType("*/*");
-
-                        // Optionally, specify a URI for the file that should appear in the
-                        // system file picker when it loads.
-                        if (SDK_INT >= Build.VERSION_CODES.O) {
-                            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Environment.DIRECTORY_DOWNLOADS);
-                        }
-
-                        startActivityForResult(intent, 1006);
-                    });
-                    ad.setButton(Dialog.BUTTON_NEGATIVE, "REMOVE", (dialog, which) -> {
-                        File isoFile = new File(AppConfig.maindirpath + "/hdd1.qcow2");
-                        try {
-                            if(!isoFile.delete()) Log.e(TAG, "Delete hdd1.qcow2 failed!");
-                        } catch (Exception e) {
-                            Log.e(TAG, "Delete hdd1.qcow2: ", e);
-                        }
-                    });
-                    ad.setButton(Dialog.BUTTON_NEUTRAL, "SHARE", (dialog, which) -> {
-                        Intent intentShareFile = new Intent(Intent.ACTION_SEND);
-                        File fileWithinMyDir = new File(AppConfig.maindirpath + "/hdd1.qcow2");
-
-                        if (fileWithinMyDir.exists()) {
-                            intentShareFile.setType("*/*");
-                            intentShareFile.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + AppConfig.maindirpath + "/hdd1.qcow2"));
-
-                            intentShareFile.putExtra(Intent.EXTRA_SUBJECT,
-                                    "Sharing File...");
-                            intentShareFile.putExtra(Intent.EXTRA_TEXT, "Sharing File...");
-
-                            startActivity(Intent.createChooser(intentShareFile, "Share File"));
-                        }
-                    });
-                    ad.show();
-                } else {
-                    Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("*/*");
-
-                    // Optionally, specify a URI for the file that should appear in the
-                    // system file picker when it loads.
-                    if (SDK_INT >= Build.VERSION_CODES.O) {
-                        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Environment.DIRECTORY_DOWNLOADS);
-                    }
-
-                    startActivityForResult(intent, 1005);
-                }
-            } else if (id == R.id.navigation_item_hdd2) {
-                if (new File(AppConfig.maindirpath + "/hdd2.qcow2").exists()) {
-                    AlertDialog ad;
-                    ad = new AlertDialog.Builder(activity, R.style.MainDialogTheme).create();
-                    ad.setTitle("REPLACE HDD2");
-                    ad.setMessage("there is hdd2 imported you want to replace it?");
-                    ad.setButton(Dialog.BUTTON_POSITIVE, "REPLACE", (dialog, which) -> {
-                        Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
-                        intent.addCategory(Intent.CATEGORY_OPENABLE);
-                        intent.setType("*/*");
-
-                        // Optionally, specify a URI for the file that should appear in the
-                        // system file picker when it loads.
-                        if (SDK_INT >= Build.VERSION_CODES.O) {
-                            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Environment.DIRECTORY_DOWNLOADS);
-                        }
-
-                        startActivityForResult(intent, 1006);
-                    });
-                    ad.setButton(Dialog.BUTTON_NEGATIVE, "REMOVE", (dialog, which) -> {
-                        File isoFile = new File(AppConfig.maindirpath + "/hdd2.qcow2");
-                        try {
-                            if(!isoFile.delete()) Log.e(TAG, "Delete hdd2.qcow2 failed!");
-                        } catch (Exception e) {
-                            Log.e(TAG, "Delete hdd2.qcow2: ", e);
-                        }
-                    });
-                    ad.setButton(Dialog.BUTTON_NEUTRAL, "SHARE", (dialog, which) -> {
-                        Intent intentShareFile = new Intent(Intent.ACTION_SEND);
-                        File fileWithinMyDir = new File(AppConfig.maindirpath + "/hdd2.qcow2");
-
-                        if (fileWithinMyDir.exists()) {
-                            intentShareFile.setType("*/*");
-                            intentShareFile.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + AppConfig.maindirpath + "/hdd2.qcow2"));
-
-                            intentShareFile.putExtra(Intent.EXTRA_SUBJECT,
-                                    "Sharing File...");
-                            intentShareFile.putExtra(Intent.EXTRA_TEXT, "Sharing File...");
-
-                            startActivity(Intent.createChooser(intentShareFile, "Share File"));
-                        }
-                    });
-                    ad.show();
-                } else {
-                    Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("*/*");
-
-                    // Optionally, specify a URI for the file that should appear in the
-                    // system file picker when it loads.
-                    if (SDK_INT >= Build.VERSION_CODES.O) {
-                        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Environment.DIRECTORY_DOWNLOADS);
-                    }
-
-                    startActivityForResult(intent, 1006);
-                }
+//            } else if (id == R.id.navigation_item_import_iso) {
+//                if (new File(AppConfig.maindirpath + "/drive.iso").exists()) {
+//                    AlertDialog ad;
+//                    ad = new AlertDialog.Builder(activity, R.style.MainDialogTheme).create();
+//                    ad.setTitle("REPLACE ISO");
+//                    ad.setMessage("there is iso imported you want to replace it?");
+//                    ad.setButton(Dialog.BUTTON_POSITIVE, "REPLACE", (dialog, which) -> {
+//                        Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
+//                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+//                        intent.setType("*/*");
+//
+//                        // Optionally, specify a URI for the file that should appear in the
+//                        // system file picker when it loads.
+//                        if (SDK_INT >= Build.VERSION_CODES.O) {
+//                            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Environment.DIRECTORY_DOWNLOADS);
+//                        }
+//
+//                        startActivityForResult(intent, 1004);
+//                    });
+//                    ad.setButton(Dialog.BUTTON_NEGATIVE, "REMOVE", (dialog, which) -> {
+//                        File isoFile = new File(AppConfig.maindirpath + "/drive.iso");
+//                        try {
+//                            if(!isoFile.delete()) Log.e(TAG, "Delete drive.iso failed!");
+//                        } catch (Exception e) {
+//                            Log.e(TAG, "Delete drive.iso: ", e);
+//                        }
+//                    });
+//                    ad.show();
+//                } else {
+//                    Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
+//                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+//                    intent.setType("*/*");
+//
+//                    // Optionally, specify a URI for the file that should appear in the
+//                    // system file picker when it loads.
+//                    if (SDK_INT >= Build.VERSION_CODES.O) {
+//                        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Environment.DIRECTORY_DOWNLOADS);
+//                    }
+//
+//                    startActivityForResult(intent, 1004);
+//                }
+//            } else if (id == R.id.navigation_item_hdd1) {
+//                if (new File(AppConfig.maindirpath + "/hdd1.qcow2").exists()) {
+//                    AlertDialog ad;
+//                    ad = new AlertDialog.Builder(activity, R.style.MainDialogTheme).create();
+//                    ad.setTitle("REPLACE HDD1");
+//                    ad.setMessage("there is hdd1 imported you want to replace it?");
+//                    ad.setButton(Dialog.BUTTON_POSITIVE, "REPLACE", (dialog, which) -> {
+//                        Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
+//                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+//                        intent.setType("*/*");
+//
+//                        // Optionally, specify a URI for the file that should appear in the
+//                        // system file picker when it loads.
+//                        if (SDK_INT >= Build.VERSION_CODES.O) {
+//                            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Environment.DIRECTORY_DOWNLOADS);
+//                        }
+//
+//                        startActivityForResult(intent, 1006);
+//                    });
+//                    ad.setButton(Dialog.BUTTON_NEGATIVE, "REMOVE", (dialog, which) -> {
+//                        File isoFile = new File(AppConfig.maindirpath + "/hdd1.qcow2");
+//                        try {
+//                            if(!isoFile.delete()) Log.e(TAG, "Delete hdd1.qcow2 failed!");
+//                        } catch (Exception e) {
+//                            Log.e(TAG, "Delete hdd1.qcow2: ", e);
+//                        }
+//                    });
+//                    ad.setButton(Dialog.BUTTON_NEUTRAL, "SHARE", (dialog, which) -> {
+//                        Intent intentShareFile = new Intent(Intent.ACTION_SEND);
+//                        File fileWithinMyDir = new File(AppConfig.maindirpath + "/hdd1.qcow2");
+//
+//                        if (fileWithinMyDir.exists()) {
+//                            intentShareFile.setType("*/*");
+//                            intentShareFile.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + AppConfig.maindirpath + "/hdd1.qcow2"));
+//
+//                            intentShareFile.putExtra(Intent.EXTRA_SUBJECT,
+//                                    "Sharing File...");
+//                            intentShareFile.putExtra(Intent.EXTRA_TEXT, "Sharing File...");
+//
+//                            startActivity(Intent.createChooser(intentShareFile, "Share File"));
+//                        }
+//                    });
+//                    ad.show();
+//                } else {
+//                    Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
+//                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+//                    intent.setType("*/*");
+//
+//                    // Optionally, specify a URI for the file that should appear in the
+//                    // system file picker when it loads.
+//                    if (SDK_INT >= Build.VERSION_CODES.O) {
+//                        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Environment.DIRECTORY_DOWNLOADS);
+//                    }
+//
+//                    startActivityForResult(intent, 1005);
+//                }
+//            } else if (id == R.id.navigation_item_hdd2) {
+//                if (new File(AppConfig.maindirpath + "/hdd2.qcow2").exists()) {
+//                    AlertDialog ad;
+//                    ad = new AlertDialog.Builder(activity, R.style.MainDialogTheme).create();
+//                    ad.setTitle("REPLACE HDD2");
+//                    ad.setMessage("there is hdd2 imported you want to replace it?");
+//                    ad.setButton(Dialog.BUTTON_POSITIVE, "REPLACE", (dialog, which) -> {
+//                        Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
+//                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+//                        intent.setType("*/*");
+//
+//                        // Optionally, specify a URI for the file that should appear in the
+//                        // system file picker when it loads.
+//                        if (SDK_INT >= Build.VERSION_CODES.O) {
+//                            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Environment.DIRECTORY_DOWNLOADS);
+//                        }
+//
+//                        startActivityForResult(intent, 1006);
+//                    });
+//                    ad.setButton(Dialog.BUTTON_NEGATIVE, "REMOVE", (dialog, which) -> {
+//                        File isoFile = new File(AppConfig.maindirpath + "/hdd2.qcow2");
+//                        try {
+//                            if(!isoFile.delete()) Log.e(TAG, "Delete hdd2.qcow2 failed!");
+//                        } catch (Exception e) {
+//                            Log.e(TAG, "Delete hdd2.qcow2: ", e);
+//                        }
+//                    });
+//                    ad.setButton(Dialog.BUTTON_NEUTRAL, "SHARE", (dialog, which) -> {
+//                        Intent intentShareFile = new Intent(Intent.ACTION_SEND);
+//                        File fileWithinMyDir = new File(AppConfig.maindirpath + "/hdd2.qcow2");
+//
+//                        if (fileWithinMyDir.exists()) {
+//                            intentShareFile.setType("*/*");
+//                            intentShareFile.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + AppConfig.maindirpath + "/hdd2.qcow2"));
+//
+//                            intentShareFile.putExtra(Intent.EXTRA_SUBJECT,
+//                                    "Sharing File...");
+//                            intentShareFile.putExtra(Intent.EXTRA_TEXT, "Sharing File...");
+//
+//                            startActivity(Intent.createChooser(intentShareFile, "Share File"));
+//                        }
+//                    });
+//                    ad.show();
+//                } else {
+//                    Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
+//                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+//                    intent.setType("*/*");
+//
+//                    // Optionally, specify a URI for the file that should appear in the
+//                    // system file picker when it loads.
+//                    if (SDK_INT >= Build.VERSION_CODES.O) {
+//                        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Environment.DIRECTORY_DOWNLOADS);
+//                    }
+//
+//                    startActivityForResult(intent, 1006);
+//                }
             } else if (id == R.id.navigation_item_desktop) {
                 launchX11(true);
             } else if (id == R.id.navigation_item_terminal) {
@@ -436,8 +436,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else if (id == R.id.navigation_item_settings) {
                 startActivity(new Intent(activity, MainSettingsManager.class));
-            } else if (id == R.id.navigation_item_store) {
-                startActivity(new Intent(activity, StoreActivity.class));
+//            } else if (id == R.id.navigation_item_store) {
+//                startActivity(new Intent(activity, StoreActivity.class));
             } else if (id == R.id.navigation_data_explorer) {
                 startActivity(new Intent(activity, DataExplorerActivity.class));
             } else if (id == R.id.navigation_item_donate) {
@@ -580,51 +580,51 @@ public class MainActivity extends AppCompatActivity {
         return (int) l;
     }
 
-    private void updateApp() {
-        int versionCode = PackageUtils.getThisVersionCode(getApplicationContext());
-        String versionName = PackageUtils.getThisVersionName(getApplicationContext());
-
-        RequestNetwork requestNetwork = new RequestNetwork(this);
-        RequestNetwork.RequestListener requestNetworkListener = new RequestNetwork.RequestListener() {
-            @Override
-            public void onResponse(String tag, String response, HashMap<String, Object> responseHeaders) {
-                View _update = findViewById(R.id.update);
-
-                if (!response.isEmpty()) {
-                    try {
-                        final JSONObject obj = new JSONObject(response);
-                        String versionNameonUpdate;
-                        int versionCodeonUpdate;
-
-                        if (MainSettingsManager.getcheckforupdatesfromthebetachannel(MainActivity.this)) {
-                            versionNameonUpdate = obj.getString("versionNameBeta");
-                            versionCodeonUpdate = obj.getInt("versionCodeBeta");
-                        } else {
-                            versionNameonUpdate = obj.getString("versionName");
-                            versionCodeonUpdate = obj.getInt("versionCode");
-                        }
-
-                        if (versionCode < versionCodeonUpdate || !versionNameonUpdate.equals(versionName)) {
-                            _update.setVisibility(View.VISIBLE);
-                        } else {
-                            _update.setVisibility(View.GONE);
-                        }
-                    } catch (JSONException e) {
-                        _update.setVisibility(View.GONE);
-                    }
-                } else {
-                    _update.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onErrorResponse(String tag, String message) {
-
-            }
-        };
-
-        requestNetwork.startRequestNetwork(RequestNetworkController.GET,AppConfig.updateJson,"maincheckupdate",requestNetworkListener);
-    }
+//    private void updateApp() {
+//        int versionCode = PackageUtils.getThisVersionCode(getApplicationContext());
+//        String versionName = PackageUtils.getThisVersionName(getApplicationContext());
+//
+//        RequestNetwork requestNetwork = new RequestNetwork(this);
+//        RequestNetwork.RequestListener requestNetworkListener = new RequestNetwork.RequestListener() {
+//            @Override
+//            public void onResponse(String tag, String response, HashMap<String, Object> responseHeaders) {
+//                View _update = findViewById(R.id.update);
+//
+//                if (!response.isEmpty()) {
+//                    try {
+//                        final JSONObject obj = new JSONObject(response);
+//                        String versionNameonUpdate;
+//                        int versionCodeonUpdate;
+//
+//                        if (MainSettingsManager.getcheckforupdatesfromthebetachannel(MainActivity.this)) {
+//                            versionNameonUpdate = obj.getString("versionNameBeta");
+//                            versionCodeonUpdate = obj.getInt("versionCodeBeta");
+//                        } else {
+//                            versionNameonUpdate = obj.getString("versionName");
+//                            versionCodeonUpdate = obj.getInt("versionCode");
+//                        }
+//
+//                        if (versionCode < versionCodeonUpdate || !versionNameonUpdate.equals(versionName)) {
+//                            _update.setVisibility(View.VISIBLE);
+//                        } else {
+//                            _update.setVisibility(View.GONE);
+//                        }
+//                    } catch (JSONException e) {
+//                        _update.setVisibility(View.GONE);
+//                    }
+//                } else {
+//                    _update.setVisibility(View.GONE);
+//                }
+//            }
+//
+//            @Override
+//            public void onErrorResponse(String tag, String message) {
+//
+//            }
+//        };
+//
+//        requestNetwork.startRequestNetwork(RequestNetworkController.GET,AppConfig.updateJson,"maincheckupdate",requestNetworkListener);
+//    }
 
     private void loadDataVbi() {
 
@@ -1191,29 +1191,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupBottomAppBar() {
-        bottomAppBar = findViewById(R.id.bottomAppBar);
-        bottomAppBar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.update) {
-                //updateApp(true);
-                startActivity(new Intent(this, UpdaterActivity.class));
-            } else if (item.getItemId() == R.id.shutdown) {
-                VMManager.requestKillAllQemuProcess(activity, null);
-            } else if (item.getItemId() == R.id.backtothedisplay) {
-                if (MainSettingsManager.getVmUi(activity).equals("VNC")) {
-                    startActivity(new Intent(activity, MainVNCActivity.class));
-                } else if (MainSettingsManager.getVmUi(activity).equals("X11")) {
-                    launchX11(false);
-                }
-            } else if (item.getItemId() == R.id.importrom) {
-                Intent intent = new Intent();
-                intent.setClass(getApplicationContext(), VMCreatorActivity.class);
-                intent.putExtra("importcvbinow", "");
-                startActivity(intent);
-            }
-            return false;
-        });
-        View _update = findViewById(R.id.update);
-        _update.setVisibility(View.GONE);
+//        bottomAppBar = findViewById(R.id.bottomAppBar);
+//        bottomAppBar.setOnMenuItemClickListener(item -> {
+//            if (item.getItemId() == R.id.update) {
+//                //updateApp(true);
+//                startActivity(new Intent(this, UpdaterActivity.class));
+//            } else if (item.getItemId() == R.id.shutdown) {
+//                VMManager.requestKillAllQemuProcess(activity, null);
+//            } else if (item.getItemId() == R.id.backtothedisplay) {
+//                if (MainSettingsManager.getVmUi(activity).equals("VNC")) {
+//                    startActivity(new Intent(activity, MainVNCActivity.class));
+//                } else if (MainSettingsManager.getVmUi(activity).equals("X11")) {
+//                    launchX11(false);
+//                }
+//            } else if (item.getItemId() == R.id.importrom) {
+//                Intent intent = new Intent();
+//                intent.setClass(getApplicationContext(), VMCreatorActivity.class);
+//                intent.putExtra("importcvbinow", "");
+//                startActivity(intent);
+//            }
+//            return false;
+//        });
+//        View _update = findViewById(R.id.update);
+//        _update.setVisibility(View.GONE);
     }
 
     private void launchX11(boolean isKillXFCE) {

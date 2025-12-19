@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/update"
-        android:icon="@drawable/syncglass96"
-        android:title="@string/update"
-        android:contentDescription="@string/update"
-        app:showAsAction="always"/>
+<!--    <item-->
+<!--        android:id="@+id/update"-->
+<!--        android:icon="@drawable/syncglass96"-->
+<!--        android:title="@string/update"-->
+<!--        android:contentDescription="@string/update"-->
+<!--        app:showAsAction="always"/>-->
     <item
         android:id="@+id/shutdown"
         android:icon="@drawable/power_settings_new_24px"

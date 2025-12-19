@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -740,6 +741,7 @@ public class FileUtils {
 	}
 
 	public static String readAFile(String filePath) {
+        Log.e(TAG, "readAFile: " + filePath);
 		StringBuilder content = new StringBuilder();
 		try (FileInputStream inputStream = new FileInputStream(filePath);
 			 BufferedReader reader = new BufferedReader(new
@@ -749,7 +751,7 @@ public class FileUtils {
 				content.append(line).append("\n");
 			}
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+            Log.e(TAG, "readAFile: ", e);
 		}
 		return content.toString();
 
@@ -916,4 +918,19 @@ public class FileUtils {
 			Log.e(TAG, "openFolder: " + e.getMessage());
 		}
 	}
+
+    public static String readTextFileFromRaw(Context context, int rawResourceId) throws IOException {
+        InputStream is = context.getResources().openRawResource(rawResourceId);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        } else {
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            byte[] data = new byte[8192];
+            int nRead;
+            while ((nRead = is.read(data, 0, data.length)) != -1) {
+                buffer.write(data, 0, nRead);
+            }
+            return new String(buffer.toByteArray(), StandardCharsets.UTF_8);
+        }
+    }
 }

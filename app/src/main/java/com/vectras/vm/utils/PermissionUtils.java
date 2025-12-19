@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Settings;
 import android.widget.Toast;
 
@@ -17,6 +18,8 @@ import com.vectras.vm.R;
 
 public class PermissionUtils {
     public static boolean storagepermission(Activity activity, boolean request) {
+        if (Build.VERSION.SDK_INT >= 33) return true;
+
         if (ContextCompat.checkSelfPermission(activity, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             return true;
         } else {

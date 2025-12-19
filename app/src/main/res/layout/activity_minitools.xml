@@ -39,71 +39,12 @@
             android:animateLayoutChanges="true"
             android:orientation="vertical"
             android:padding="8dp">
-
-            <LinearLayout
-                android:id="@+id/mirror"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/object_shape_top_high"
-                android:gravity="center_vertical"
-                android:paddingLeft="16dp"
-                android:paddingTop="2dp"
-                android:paddingRight="2dp"
-                android:paddingBottom="2dp">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/host_24px" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/mirror" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/object_shape_inside_object_top">
-
-                    <Spinner
-                        android:id="@+id/spinnerselectmirror"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:spinnerMode="dialog"
-                        tools:listitem="@layout/simple_layout_for_spiner" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/setupsoundfortermux"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:background="@drawable/object_shape_middle_high"
-                android:gravity="center_vertical"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/volume_up_24px" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
-                    android:text="@string/setup_sound" />
-            </LinearLayout>
-
             <LinearLayout
                 android:id="@+id/cleanup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:background="@drawable/object_shape_middle_high"
+                android:background="@drawable/object_shape_top_high"
                 android:gravity="center_vertical"
                 android:padding="16dp">
 
@@ -166,7 +107,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:background="@drawable/object_shape_middle_high"
+                android:background="@drawable/object_shape_bottom_high"
                 android:gravity="center_vertical"
                 android:padding="16dp">
 
@@ -180,27 +121,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:text="@string/delete_all" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/reinstallsystem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:background="@drawable/object_shape_bottom_high"
-                android:gravity="center_vertical"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/system_update_24px" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
-                    android:text="@string/reinstall_system" />
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

@@ -16,18 +16,13 @@ import android.os.StrictMode;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
@@ -35,7 +30,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.color.MaterialColors;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.vectras.nativeQemu.assetsManager;
 import com.vectras.qemu.Config;
 import com.vectras.qemu.MainSettingsManager;
@@ -44,15 +38,14 @@ import com.vectras.vm.AppConfig;
 import com.vectras.vm.VMCreatorActivity;
 import com.vectras.vm.Minitools;
 import com.vectras.vm.R;
-import com.vectras.vm.RequestNetwork;
-import com.vectras.vm.RequestNetworkController;
+import com.vectras.vm.network.RequestNetwork;
+import com.vectras.vm.network.RequestNetworkController;
 import com.vectras.vm.databinding.BottomsheetdialogLoggerBinding;
 import com.vectras.vm.databinding.UpdateBottomDialogLayoutBinding;
 import com.vectras.vm.home.romstore.RomStoreHomeAdapterSearch;
 import com.vectras.vm.Roms.DataRoms;
 import com.vectras.vm.RomStoreActivity;
 import com.vectras.vm.SetArchActivity;
-import com.vectras.vm.StoreActivity;
 import com.vectras.vm.VMManager;
 import com.vectras.vm.adapter.LogsAdapter;
 import com.vectras.vm.databinding.ActivityHomeBinding;
@@ -66,8 +59,6 @@ import com.vectras.vm.home.romstore.RomStoreFragment;
 import com.vectras.vm.home.vms.VmsFragment;
 import com.vectras.vm.logger.VectrasStatus;
 import com.vectras.vm.settings.UpdaterActivity;
-import com.vectras.vm.utils.DeviceUtils;
-import com.vectras.vm.utils.DialogUtils;
 import com.vectras.vm.utils.FileUtils;
 import com.vectras.vm.utils.NotificationUtils;
 import com.vectras.vm.utils.PackageUtils;
@@ -77,14 +68,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -94,7 +82,6 @@ public class HomeActivity extends AppCompatActivity implements RomStoreFragment.
     public static boolean isNeedRecreate = false;
     public static boolean isOpenHome = false;
     public static boolean isOpenRomStore = false;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     ActivityHomeBinding binding;
     ActivityHomeContentBinding bindingContent;
     private RomStoreHomeAdapterSearch adapterRomStoreSearch;
@@ -266,18 +253,13 @@ public class HomeActivity extends AppCompatActivity implements RomStoreFragment.
 
         setupDrawer();
 
-        try {
-            assetsManager.installQemuAll(this);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         //DialogUtils.joinTelegram(this);
         NotificationUtils.clearAll(this);
 
         if (MainSettingsManager.getPromptUpdateVersion(this))
-
             updateApp();
+
+        NotificationUtils.requestPermission(this);
     }
 
     @Override
@@ -343,69 +325,6 @@ public class HomeActivity extends AppCompatActivity implements RomStoreFragment.
         }
     }
 
-    private final ActivityResultLauncher<String> isoPicker =
-            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
-                if (uri == null) return;
-
-                if (VMManager.isAISOFile(FileUtils.getFileNameFromUri(this, uri))) {
-                    importFile(uri, AppConfig.importedDriveFolder + "/drive.iso");
-                } else {
-                    DialogUtils.twoDialog(this,
-                            getString(R.string.problem_has_been_detected),
-                            getString(R.string.file_format_is_not_supported),
-                            getResources().getString(R.string.continuetext),
-                            getResources().getString(R.string.cancel),
-                            true,
-                            R.drawable.album_24px,
-                            true,
-                            () -> importFile(uri, AppConfig.importedDriveFolder + "/drive.iso"),
-                            null,
-                            null);
-                }
-            });
-
-    private final ActivityResultLauncher<String> hdd1Picker =
-            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
-                if (uri == null) return;
-
-                if (VMManager.isADiskFile(FileUtils.getFileNameFromUri(this, uri))) {
-                    importFile(uri, AppConfig.importedDriveFolder + "/hdd1.qcow2");
-                } else {
-                    DialogUtils.twoDialog(this,
-                            getString(R.string.problem_has_been_detected),
-                            getString(R.string.file_format_is_not_supported),
-                            getResources().getString(R.string.continuetext),
-                            getResources().getString(R.string.cancel),
-                            true,
-                            R.drawable.hard_drive_24px,
-                            true,
-                            () -> importFile(uri, AppConfig.importedDriveFolder + "/hdd1.qcow2"),
-                            null,
-                            null);
-                }
-            });
-
-    private final ActivityResultLauncher<String> hdd2Picker =
-            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
-                if (uri == null) return;
-
-                if (VMManager.isADiskFile(FileUtils.getFileNameFromUri(this, uri))) {
-                    importFile(uri, AppConfig.importedDriveFolder + "/hdd2.qcow2");
-                } else {
-                    DialogUtils.twoDialog(this,
-                            getString(R.string.problem_has_been_detected),
-                            getString(R.string.file_format_is_not_supported),
-                            getResources().getString(R.string.continuetext),
-                            getResources().getString(R.string.cancel),
-                            true,
-                            R.drawable.hard_drive_24px,
-                            true,
-                            () -> importFile(uri, AppConfig.importedDriveFolder + "/hdd2.qcow2"),
-                            null,
-                            null);
-                }
-            });
-
     private void setupDrawer() {
         binding.drawerLayout.setScrimColor(Color.parseColor("#40000000")); //25%
 
@@ -430,101 +349,15 @@ public class HomeActivity extends AppCompatActivity implements RomStoreFragment.
                 Intent w = new Intent(ACTION_VIEW);
                 w.setData(Uri.parse(tw));
                 startActivity(w);
-            } else if (id == R.id.navigation_item_import_iso) {
-                if (new File(AppConfig.importedDriveFolder + "/drive.iso").exists()) {
-                    DialogUtils.threeDialog(
-                            this,
-                            "Replace iso",
-                            "There is iso imported you want to replace it?",
-                            getString(R.string.replace),
-                            getString(R.string.cancel),
-                            getString(R.string.remove),
-                            true,
-                            R.drawable.album_24px,
-                            true,
-                            () -> isoPicker.launch("*/*"),
-                            null,
-                            () -> {
-                                try {
-                                    File isoFile = new File(AppConfig.importedDriveFolder + "/drive.iso");
-                                    DialogUtils.fileDeletionResult(this, isoFile.delete());
-                                } catch (Exception e) {
-                                    DialogUtils.fileDeletionResult(this, false);
-                                }
-                            },
-                            null);
-                } else {
-                    isoPicker.launch("*/*");
-                }
-            } else if (id == R.id.navigation_item_hdd1) {
-                if (new File(AppConfig.importedDriveFolder + "/hdd1.qcow2").exists()) {
-                    DialogUtils.threeDialog(
-                            this,
-                            "Replace HDD1",
-                            "There is HDD1 imported you want to replace it?",
-                            getString(R.string.replace),
-                            getString(R.string.cancel),
-                            getString(R.string.remove),
-                            true,
-                            R.drawable.hard_drive_24px,
-                            true,
-                            () -> hdd1Picker.launch("*/*"),
-                            null,
-                            () -> {
-                                try {
-                                    File hdd1File = new File(AppConfig.importedDriveFolder + "/hdd1.qcow2");
-                                    DialogUtils.fileDeletionResult(this, hdd1File.delete());
-                                } catch (Exception e) {
-                                    DialogUtils.fileDeletionResult(this, false);
-                                }
-                            },
-                            null);
-                } else {
-                    hdd1Picker.launch("*/*");
-                }
-            } else if (id == R.id.navigation_item_hdd2) {
-                if (new File(AppConfig.importedDriveFolder + "/hdd2.qcow2").exists()) {
-                    DialogUtils.threeDialog(
-                            this,
-                            "Replace HDD2",
-                            "There is HDD2 imported you want to replace it?",
-                            getString(R.string.replace),
-                            getString(R.string.cancel),
-                            getString(R.string.remove),
-                            true,
-                            R.drawable.hard_drive_24px,
-                            true,
-                            () -> hdd2Picker.launch("*/*"),
-                            null,
-                            () -> {
-                                try {
-                                    File hdd1File = new File(AppConfig.importedDriveFolder + "/hdd2.qcow2");
-                                    DialogUtils.fileDeletionResult(this, hdd1File.delete());
-                                } catch (Exception e) {
-                                    DialogUtils.fileDeletionResult(this, false);
-                                }
-                            },
-                            null);
-                } else {
-                    hdd2Picker.launch("*/*");
-                }
             } else if (id == R.id.navigation_item_desktop) {
                 DisplaySystem.launchX11(this, true);
             } else if (id == R.id.navigation_item_terminal) {
-                if (DeviceUtils.is64bit()) {
-                    //startActivity(new Intent(this, TermuxActivity.class));
-                    com.vectras.vterm.TerminalBottomSheetDialog VTERM = new com.vectras.vterm.TerminalBottomSheetDialog(this);
-                    VTERM.showVterm();
-                } else {
-                    com.vectras.vterm.TerminalBottomSheetDialog VTERM = new com.vectras.vterm.TerminalBottomSheetDialog(this);
-                    VTERM.showVterm();
-                }
+                com.vectras.vterm.TerminalBottomSheetDialog VTERM = new com.vectras.vterm.TerminalBottomSheetDialog(this);
+                VTERM.showVterm();
             } else if (id == R.id.navigation_item_view_logs) {
                 showLogsDialog();
             } else if (id == R.id.navigation_item_settings) {
                 startActivity(new Intent(this, MainSettingsManager.class));
-            } else if (id == R.id.navigation_item_store) {
-                startActivity(new Intent(this, StoreActivity.class));
             } else if (id == R.id.navigation_data_explorer) {
 //                startActivity(new Intent(this, DataExplorerActivity.class));
                 FileUtils.openFolder(this, AppConfig.maindirpath);
@@ -652,44 +485,6 @@ public class HomeActivity extends AppCompatActivity implements RomStoreFragment.
             binding.rvRomstoresearch.setVisibility(View.VISIBLE);
 
         adapterRomStoreSearch.notifyDataSetChanged();
-    }
-
-    private void importFile(Uri uri, String copyTo) {
-        if (uri == null) return;
-
-        View progressView = LayoutInflater.from(this).inflate(R.layout.dialog_progress_style, null);
-        TextView progress_text = progressView.findViewById(R.id.progress_text);
-        progress_text.setText(getString(R.string.importing_file));
-        AlertDialog progressDialog = new MaterialAlertDialogBuilder(this, R.style.CenteredDialogTheme)
-                .setView(progressView)
-                .setCancelable(false)
-                .create();
-        progressDialog.show();
-
-        AtomicBoolean isCompleted = new AtomicBoolean(false);
-        executor.execute(() -> {
-            try {
-                FileUtils.copyFileFromUri(this, uri, copyTo);
-                isCompleted.set(true);
-            } catch (Exception e) {
-                isCompleted.set(false);
-            } finally {
-                runOnUiThread(() -> {
-                    progressDialog.dismiss();
-                    DialogUtils.oneDialog(
-                            this,
-                            isCompleted.get() ? getString(R.string.imported) : getString(R.string.oops),
-                            isCompleted.get() ? getString(R.string.file_imported_successfully) : getString(R.string.file_import_failed),
-                            getString(R.string.ok),
-                            true,
-                            isCompleted.get() ? R.drawable.check_24px : R.drawable.error_96px,
-                            true,
-                            null,
-                            null
-                    );
-                });
-            }
-        });
     }
 
     private void showLogsDialog() {

@@ -29,6 +29,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.material.color.DynamicColors;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.vectras.qemu.Config;
 import com.vectras.qemu.MainSettingsManager;
 import com.vectras.vm.utils.FileUtils;
@@ -54,6 +55,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class VectrasApp extends Application {
@@ -106,6 +108,8 @@ public class VectrasApp extends Application {
             @Override public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {}
             @Override public void onActivityDestroyed(@NonNull Activity activity) {}
         });
+
+        FirebaseAnalytics.getInstance(this);
 	}
 
 	public void overrideFont(String defaultFontNameToOverride, int customFontResourceId) {
@@ -430,7 +434,7 @@ public class VectrasApp extends Application {
 		AppConfig.vectrasVersionCode = PackageUtils.getThisVersionCode(_context);
 		AppConfig.internalDataDirPath = getFilesDir().getPath() + "/";
 		AppConfig.basefiledir = AppConfig.datadirpath(_context) + "/.qemu/";
-		AppConfig.maindirpath = FileUtils.getExternalFilesDirectory(_context).getPath() + "/";
+		AppConfig.maindirpath = Objects.requireNonNull(getExternalFilesDir("VectrasVM")).getAbsolutePath() + "/";
 		AppConfig.sharedFolder = AppConfig.maindirpath + "SharedFolder/";
 		AppConfig.downloadsFolder = AppConfig.maindirpath + "Downloads/";
 		AppConfig.romsdatajson = AppConfig.maindirpath + "roms-data.json";

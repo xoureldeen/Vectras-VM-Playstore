@@ -13,6 +13,7 @@ import androidx.preference.PreferenceManager;
 
 import com.vectras.qemu.MainSettingsManager;
 import com.vectras.vm.home.HomeActivity;
+import com.vectras.vm.setupwizard.SetupFeatureCore;
 import com.vectras.vm.setupwizard.SetupWizard2Activity;
 import com.vectras.vm.setupwizard.SetupWizardActivity;
 import com.vectras.vm.utils.DeviceUtils;
@@ -126,7 +127,7 @@ public class SplashActivity extends AppCompatActivity implements Runnable {
 
     @Override
     public void run() {
-        if ((new File(AppConfig.internalDataDirPath, "distro/usr/local/bin/qemu-system-x86_64").exists()) || (new File(AppConfig.internalDataDirPath, "distro/usr/bin/qemu-system-x86_64").exists())) {
+        if (SetupFeatureCore.isInstalledSystemFiles(this)) {
             startActivity(new Intent(this, HomeActivity.class));
         } else {
             startActivity(new Intent(this, SetupWizard2Activity.class));

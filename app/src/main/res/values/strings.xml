@@ -3,7 +3,7 @@
     <string name="app_name">Vectras VM</string>
 
     <!--======================VECTRAS STRINGS====================-->
-    <string name="app_version" translatable="false">3.4.1</string>
+    <string name="app_version" translatable="false">10.0.0</string>
     <string name="qemu_version" translatable="false">Native</string>
     <!-- logger -->
     <string name="startvm">VM STARTED!</string>
@@ -459,6 +459,26 @@
     <string name="the_required_package_is_not_installed_content">The required package is not installed, you need to install it before using this feature.</string>
     <string name="need_install_termux_x11_content">Termux:X11 app is not installed, you need to install it to continue.</string>
     <string name="X11_display">X11 display</string>
+    <string name="settings_for_X11_display">Settings for X11 display.</string>
+    <string name="use_X11_display">Use X11 display</string>
+    <string name="check_before_extract">Check before extract</string>
+    <string name="check_before_extract_note">Quickly detect errors to avoid wasting time decompressing and errors occurring after decompression.</string>
+    <string name="checking">Checking…</string>
+    <string name="x11_display_cannot_be_used_at_this_time_content">X11 display cannot be used at this time, try closing and reopening the Vectras VM.</string>
+    <string name="run_qemu_with_xterm">Run Qemu with Xterm</string>
+    <string name="run_qemu_with_xterm_note">To run commands with Qemu monitor easier without switching.</string>
+    <string name="quick_edit">Quick edit</string>
+    <string name="write_something">Write something…</string>
+    <string name="switch_to_vnc">Switch to VNC</string>
+    <string name="preferences">Preferences</string>
+    <string name="go_to_termux_x11_settings">Go to Termux:X11 settings.</string>
+    <string name="size_gb">Size (GB)</string>
+    <string name="create_a_new_virtual_disk">Create a new virtual disk</string>
+    <string name="it_will_be_created_in">It will be created in</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="terms_note">Please read the entire content below before accepting.</string>
+    <string name="i_have_read_it_all_and_agree">I have read it all and agree</string>
 
 
     <!--======================TERMUX STRINGS====================-->

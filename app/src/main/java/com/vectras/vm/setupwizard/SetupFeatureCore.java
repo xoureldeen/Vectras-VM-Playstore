@@ -27,7 +27,7 @@ public class SetupFeatureCore {
     public static String lastErrorLog = "";
 
     public static boolean isInstalledSystemFiles(Context context) {
-        return isInstalledProot(context) && isInstalledDistro(context);
+        return isInstalledQemu(context) && isInstalledLibraries(context) && isInstalledFirmwares(context);
     }
 
     public static boolean isInstalledProot(Context context) {
@@ -36,6 +36,21 @@ public class SetupFeatureCore {
 
     public static boolean isInstalledDistro(Context context) {
         return FileUtils.isFileExists(context.getFilesDir().getAbsolutePath() + "/distro/bin/busybox");
+    }
+
+    public static boolean isInstalledQemu(Context context) {
+        return FileUtils.isFileExists(context.getFilesDir().getAbsolutePath() + "/qemu/bin/qemu-img") &&
+                FileUtils.isFileExists(context.getFilesDir().getAbsolutePath() + "/qemu/bin/qemu-system-i386") &&
+                FileUtils.isFileExists(context.getFilesDir().getAbsolutePath() + "/qemu/bin/qemu-system-ppc") &&
+                FileUtils.isFileExists(context.getFilesDir().getAbsolutePath() + "/qemu/bin/qemu-system-x86_64");
+    }
+
+    public static boolean isInstalledLibraries(Context context) {
+        return FileUtils.isFileExists(context.getFilesDir().getAbsolutePath() + "/qemu/libs/libglib-2.0.so");
+    }
+
+    public static boolean isInstalledFirmwares(Context context) {
+        return FileUtils.isFileExists(context.getFilesDir().getAbsolutePath() + "/qemu/pc-bios/bios.bin");
     }
 
     public static boolean startExtractSystemFiles(Context context) {
