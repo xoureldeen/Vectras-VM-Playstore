@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "950289240472",
+    "project_id": "vectras-android",
+    "storage_bucket": "vectras-android.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:950289240472:android:16fcc3c0c7c289a0dc5bed",
+        "android_client_info": {
+          "package_name": "com.vectras.vm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3R_Ff9ABFtlqUU4zArA917oZi8uqFK_Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
