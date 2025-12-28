@@ -19,6 +19,9 @@ android {
         versionName "10.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
+
+        resValue "string", "app_version", versionName
+        resValue "integer", "app_version_code", versionCode.toString()
     }
 
     signingConfigs {

@@ -1,7 +1,6 @@
-package com.vectras.vm.home;
+package com.vectras.vm.main;
 
 import static android.content.Intent.ACTION_VIEW;
-import static com.vectras.vm.VectrasApp.getApp;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -24,13 +23,16 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.material.behavior.HideViewOnScrollBehavior;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.color.MaterialColors;
-import com.vectras.nativeQemu.assetsManager;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.vectras.qemu.Config;
 import com.vectras.qemu.MainSettingsManager;
 import com.vectras.vm.AboutActivity;
@@ -42,23 +44,23 @@ import com.vectras.vm.network.RequestNetwork;
 import com.vectras.vm.network.RequestNetworkController;
 import com.vectras.vm.databinding.BottomsheetdialogLoggerBinding;
 import com.vectras.vm.databinding.UpdateBottomDialogLayoutBinding;
-import com.vectras.vm.home.romstore.RomStoreHomeAdapterSearch;
-import com.vectras.vm.Roms.DataRoms;
-import com.vectras.vm.RomStoreActivity;
+import com.vectras.vm.main.romstore.RomStoreHomeAdapterSearch;
+import com.vectras.vm.main.romstore.DataRoms;
 import com.vectras.vm.SetArchActivity;
 import com.vectras.vm.VMManager;
 import com.vectras.vm.adapter.LogsAdapter;
 import com.vectras.vm.databinding.ActivityHomeBinding;
 import com.vectras.vm.databinding.ActivityHomeContentBinding;
-import com.vectras.vm.home.core.CallbackInterface;
-import com.vectras.vm.home.core.DisplaySystem;
-import com.vectras.vm.home.core.PendingCommand;
-import com.vectras.vm.home.core.SharedData;
-import com.vectras.vm.home.monitor.SystemMonitorFragment;
-import com.vectras.vm.home.romstore.RomStoreFragment;
-import com.vectras.vm.home.vms.VmsFragment;
+import com.vectras.vm.main.core.CallbackInterface;
+import com.vectras.vm.main.core.DisplaySystem;
+import com.vectras.vm.main.core.PendingCommand;
+import com.vectras.vm.main.core.SharedData;
+import com.vectras.vm.main.monitor.SystemMonitorFragment;
+import com.vectras.vm.main.romstore.RomStoreFragment;
+import com.vectras.vm.main.vms.VmsFragment;
 import com.vectras.vm.logger.VectrasStatus;
 import com.vectras.vm.settings.UpdaterActivity;
+import com.vectras.vm.utils.DialogUtils;
 import com.vectras.vm.utils.FileUtils;
 import com.vectras.vm.utils.NotificationUtils;
 import com.vectras.vm.utils.PackageUtils;
@@ -68,16 +70,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-public class HomeActivity extends AppCompatActivity implements RomStoreFragment.RomStoreCallToHomeListener, VmsFragment.VmsCallToHomeListener {
+public class MainActivity extends AppCompatActivity implements RomStoreFragment.RomStoreCallToHomeListener, VmsFragment.VmsCallToHomeListener {
     private final String TAG = "HomeActivity";
+    private int currentBottomBarSelectedItemId = 0;
     public static boolean isActivate = false;
     public static boolean isNeedRecreate = false;
     public static boolean isOpenHome = false;
@@ -176,6 +181,14 @@ public class HomeActivity extends AppCompatActivity implements RomStoreFragment.
             Fragment selectedFragment;
 
             int id = item.getItemId();
+
+            if (id == currentBottomBarSelectedItemId) {
+                if (id == R.id.item_romstore) {
+                    if (bindingContent.searchbar.isEnabled()) binding.searchview.show();
+                }
+                return true;
+            }
+
             if (id == R.id.item_home) {
                 selectedFragment = new VmsFragment();
                 bindingContent.efabCreate.setVisibility(View.VISIBLE);
@@ -201,8 +214,11 @@ public class HomeActivity extends AppCompatActivity implements RomStoreFragment.
             getSupportFragmentManager().beginTransaction()
                     .replace(bindingContent.containerView.getId(), selectedFragment)
                     .commit();
+            currentBottomBarSelectedItemId = id;
             return true;
         });
+
+        currentBottomBarSelectedItemId = bindingContent.bottomNavigation.getSelectedItemId();
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -215,7 +231,8 @@ public class HomeActivity extends AppCompatActivity implements RomStoreFragment.
                     binding.searchview.hide();
                 } else if (bindingContent.bottomNavigation.getSelectedItemId() != R.id.item_home) {
                     bindingContent.bottomNavigation.setSelectedItemId(R.id.item_home);
-                } else if (MainSettingsManager.getQuickStart(HomeActivity.this)) {
+                    showBottomBarAndFab();
+                } else if (MainSettingsManager.getQuickStart(MainActivity.this)) {
                     Intent intent = new Intent(Intent.ACTION_MAIN);
                     intent.addCategory(Intent.CATEGORY_HOME);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -322,6 +339,49 @@ public class HomeActivity extends AppCompatActivity implements RomStoreFragment.
             isOpenHome = false;
             if (binding.searchview.isShowing()) binding.searchview.hide();
             bindingContent.bottomNavigation.setSelectedItemId(R.id.item_home);
+            showBottomBarAndFab();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            Uri content_describer = data.getData();
+            File selectedFilePath;
+            try {
+                selectedFilePath = new File(Objects.requireNonNull(FileUtils.getPath(this, content_describer)));
+            } catch (Exception e) {
+                DialogUtils.oneDialog(this,
+                        getString(R.string.oops),
+                        getString(R.string.invalid_file_path_content),
+                        getString(R.string.ok),
+                        true,
+                        R.drawable.error_96px,
+                        true,
+                        null,
+                        null
+                );
+                return;
+            }
+
+            switch (requestCode) {
+                case 120:
+                    VMManager.changeCDROM(selectedFilePath.getAbsolutePath(), this);
+                    break;
+                case 889:
+                    VMManager.changeFloppyDriveA(selectedFilePath.getAbsolutePath(), this);
+                    break;
+                case 13335:
+                    VMManager.changeFloppyDriveB(selectedFilePath.getAbsolutePath(), this);
+                    break;
+                case 32:
+                    VMManager.changeSDCard(selectedFilePath.getAbsolutePath(), this);
+                    break;
+                case 1996:
+                    VMManager.changeRemovableDevice(VMManager.pendingDeviceID, selectedFilePath.getAbsolutePath(), this);
+                    break;
+            }
         }
     }
 
@@ -366,16 +426,36 @@ public class HomeActivity extends AppCompatActivity implements RomStoreFragment.
                 Intent w = new Intent(ACTION_VIEW);
                 w.setData(Uri.parse(tw));
                 startActivity(w);
-            } else if (id == R.id.navigation_item_get_rom) {
-                Intent intent = new Intent();
-                intent.setClass(getApplicationContext(), RomStoreActivity.class);
-                startActivity(intent);
             } else if (id == R.id.mini_tools) {
                 Intent intent = new Intent();
                 intent.setClass(this, Minitools.class);
                 startActivity(intent);
             }
             return false;
+        });
+    }
+
+    private void showBottomBarAndFab() {
+        bindingContent.bottomNavigation.post(() -> {
+            CoordinatorLayout.LayoutParams lp =
+                    (CoordinatorLayout.LayoutParams) bindingContent.bottomNavigation.getLayoutParams();
+
+            HideViewOnScrollBehavior<BottomNavigationView> behavior = (HideViewOnScrollBehavior<BottomNavigationView>) lp.getBehavior();
+
+            if (behavior != null) {
+                behavior.slideIn(bindingContent.bottomNavigation);
+            }
+        });
+
+        bindingContent.efabCreate.post(() -> {
+            CoordinatorLayout.LayoutParams lpfab =
+                    (CoordinatorLayout.LayoutParams) bindingContent.efabCreate.getLayoutParams();
+
+            HideViewOnScrollBehavior<ExtendedFloatingActionButton> behaviorfab = (HideViewOnScrollBehavior<ExtendedFloatingActionButton>) lpfab.getBehavior();
+
+            if (behaviorfab != null) {
+                behaviorfab.slideIn(bindingContent.efabCreate);
+            }
         });
     }
 
@@ -395,7 +475,7 @@ public class HomeActivity extends AppCompatActivity implements RomStoreFragment.
 //                        String message;
 //                        String size;
 
-                        if (MainSettingsManager.getcheckforupdatesfromthebetachannel(HomeActivity.this)) {
+                        if (MainSettingsManager.getcheckforupdatesfromthebetachannel(MainActivity.this)) {
                             versionNameonUpdate = obj.getString("versionNameBeta");
                             versionCodeonUpdate = obj.getInt("versionCodeBeta");
 //                            message = obj.getString("MessageBeta");
@@ -408,9 +488,9 @@ public class HomeActivity extends AppCompatActivity implements RomStoreFragment.
                         }
 
                         if ((versionCode < versionCodeonUpdate &&
-                                !MainSettingsManager.getSkipVersion(HomeActivity.this).equals(versionNameonUpdate))) {
+                                !MainSettingsManager.getSkipVersion(MainActivity.this).equals(versionNameonUpdate))) {
 
-                            BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(HomeActivity.this);
+                            BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(MainActivity.this);
                             UpdateBottomDialogLayoutBinding updateBottomDialogLayoutBinding = UpdateBottomDialogLayoutBinding.inflate(getLayoutInflater());
                             bottomSheetDialog.setContentView(updateBottomDialogLayoutBinding.getRoot());
 
@@ -420,14 +500,14 @@ public class HomeActivity extends AppCompatActivity implements RomStoreFragment.
 //                            tvContent.setText(Html.fromHtml(message + "<br><br>Update size:<br>" + size));
 
                             updateBottomDialogLayoutBinding.bnSkip.setOnClickListener(view -> {
-                                MainSettingsManager.setSkipVersion(HomeActivity.this, versionNameonUpdate);
+                                MainSettingsManager.setSkipVersion(MainActivity.this, versionNameonUpdate);
                                 bottomSheetDialog.dismiss();
                             });
 
                             updateBottomDialogLayoutBinding.bnLater.setOnClickListener(view -> bottomSheetDialog.dismiss());
 
                             updateBottomDialogLayoutBinding.bnUpdate.setOnClickListener(view -> {
-                                startActivity(new Intent(HomeActivity.this, UpdaterActivity.class));
+                                startActivity(new Intent(MainActivity.this, UpdaterActivity.class));
                                 bottomSheetDialog.dismiss();
                             });
 
@@ -451,7 +531,7 @@ public class HomeActivity extends AppCompatActivity implements RomStoreFragment.
     @SuppressLint("NotifyDataSetChanged")
     private void search(String keyword) {
         try {
-            // Extract data from json and store into ArrayList as class objects
+            // Extract data from JSON and store into ArrayList as class objects
             List<DataRoms> filteredData = new ArrayList<>();
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -493,8 +573,8 @@ public class HomeActivity extends AppCompatActivity implements RomStoreFragment.
         bottomSheetDialog.setContentView(bottomsheetdialogLoggerBinding.getRoot());
         bottomSheetDialog.show();
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getApp());
-        LogsAdapter mLogAdapter = new LogsAdapter(layoutManager, getApp());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        LogsAdapter mLogAdapter = new LogsAdapter(layoutManager, this);
         bottomsheetdialogLoggerBinding.recyclerLog.setAdapter(mLogAdapter);
         bottomsheetdialogLoggerBinding.recyclerLog.setLayoutManager(layoutManager);
         mLogAdapter.scrollToLastPosition();

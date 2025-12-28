@@ -3,7 +3,6 @@
     <string name="app_name">Vectras VM</string>
 
     <!--======================VECTRAS STRINGS====================-->
-    <string name="app_version" translatable="false">10.0.0</string>
     <string name="qemu_version" translatable="false">Native</string>
     <!-- logger -->
     <string name="startvm">VM STARTED!</string>
@@ -479,6 +478,11 @@
     <string name="terms_of_service">Terms of Service</string>
     <string name="terms_note">Please read the entire content below before accepting.</string>
     <string name="i_have_read_it_all_and_agree">I have read it all and agree</string>
+    <string name="device_manager">Device manager</string>
+    <string name="show_in_folder">Show in folder</string>
+    <string name="exit">Exit</string>
+    <string name="refresh">Refresh</string>
+    <string name="last_crash_note">We are very sorry about an incident that occurred and app crashed earlier.</string>
 
 
     <!--======================TERMUX STRINGS====================-->

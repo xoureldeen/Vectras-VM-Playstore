@@ -170,7 +170,7 @@ public class Config {
     public static boolean defaultCheckNewVersion = false;
 
     // App config
-    public static final String datadirpath = VectrasApp.getApp().getExternalFilesDir("data")+"/";
+    public static final String datadirpath = VectrasApp.getContext().getExternalFilesDir("data")+"/";
 
 	public static String machinename = "VECTRAS";
 	public static int paused = 0;

@@ -16,7 +16,6 @@ import androidx.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.preference.EditTextPreference;
@@ -28,7 +27,6 @@ import androidx.preference.SwitchPreferenceCompat;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.vectras.vm.R;
 import com.vectras.vm.SplashActivity;
-import com.vectras.vm.VectrasApp;
 import com.vectras.vm.settings.ThemeActivity;
 
 import java.util.Locale;
@@ -270,21 +268,6 @@ public class MainSettingsManager extends AppCompatActivity
                     return true;
                 });
             }
-        }
-
-        private void onNightMode() {
-            if (MainSettingsManager.getModeNight(activity)) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                VectrasApp.getApp().setTheme(R.style.AppTheme);
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                VectrasApp.getApp().setTheme(R.style.AppTheme);
-            }
-
-            Intent intent = new Intent(requireActivity().getApplicationContext(), SplashActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            requireActivity().finishAffinity();
         }
 
         @Override
@@ -1079,5 +1062,17 @@ public class MainSettingsManager extends AppCompatActivity
     public static Boolean getCyclicRedundancyCheck(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getBoolean("cyclicRedundancyCheck", true);
+    }
+
+    public static void setShowLastCrashLog(Context context, Boolean _boolean) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor edit = prefs.edit();
+        edit.putBoolean("showLastCrashLog", _boolean);
+        edit.apply();
+    }
+
+    public static Boolean getShowLastCrashLog(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean("showLastCrashLog", false);
     }
 }

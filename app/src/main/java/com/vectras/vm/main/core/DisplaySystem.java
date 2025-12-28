@@ -1,18 +1,15 @@
-package com.vectras.vm.home.core;
+package com.vectras.vm.main.core;
 
 import static android.os.Build.VERSION.SDK_INT;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Build;
 import android.util.Log;
 
-import com.termux.app.TermuxService;
 import com.vectras.qemu.Config;
 import com.vectras.qemu.MainSettingsManager;
 import com.vectras.qemu.MainVNCActivity;
 import com.vectras.vm.R;
-import com.vectras.vm.core.ShellExecutor;
 import com.vectras.vm.core.TermuxX11;
 import com.vectras.vm.utils.DeviceUtils;
 import com.vectras.vm.utils.DialogUtils;
@@ -20,9 +17,6 @@ import com.vectras.vm.utils.FileUtils;
 import com.vectras.vm.utils.PackageUtils;
 import com.vectras.vm.x11.X11Activity;
 import com.vectras.vterm.Terminal;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class DisplaySystem {
     private static final String TAG = "DisplaySystem";

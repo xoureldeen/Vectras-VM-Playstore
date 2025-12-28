@@ -34,7 +34,7 @@ import com.vectras.qemu.MainSettingsManager;
 import com.vectras.qemu.MainVNCActivity;
 import com.vectras.qemu.VNCConfig;
 import com.vectras.qemu.utils.QmpClient;
-import com.vectras.vm.home.HomeActivity;
+import com.vectras.vm.main.MainActivity;
 import com.vectras.vm.settings.VNCSettingsActivity;
 import com.vectras.vm.utils.DialogUtils;
 import com.vectras.vm.utils.FileUtils;
@@ -187,7 +187,7 @@ public class VMManager {
         }
         UIUtils.toastLong(_activity, _vmName + _activity.getString(R.string.are_removed_successfully));
 
-        HomeActivity.refeshVMListNow();
+        MainActivity.refeshVMListNow();
     }
 
     public static String idGenerator() {
@@ -597,7 +597,7 @@ public class VMManager {
         if (_result.contains("proot\": error=2,")) {
             DialogUtils.twoDialog(_activity, _activity.getResources().getString(R.string.problem_has_been_detected), _activity.getResources().getString(R.string.error_PROOT_IS_MISSING_0), _activity.getString(R.string.continuetext), _activity.getString(R.string.cancel), true, R.drawable.build_24px, true,
                     () -> {
-                        HomeActivity.isActivate = false;
+                        MainActivity.isActivate = false;
                         FileUtils.deleteDirectory(_activity.getFilesDir().getAbsolutePath() + "/data");
                         FileUtils.deleteDirectory(_activity.getFilesDir().getAbsolutePath() + "/distro");
                         FileUtils.deleteDirectory(_activity.getFilesDir().getAbsolutePath() + "/usr");
@@ -677,7 +677,7 @@ public class VMManager {
         } else {
             DialogUtils.oneDialog(_context, _context.getString(R.string.done), _context.getString(R.string.roms_data_json_fixed_successfully), _context.getString(R.string.ok),true, R.drawable.check_24px, true,null, null);
         }
-        HomeActivity.refeshVMListNow();
+        MainActivity.refeshVMListNow();
         movetoRecycleBin();
     }
 
@@ -830,149 +830,159 @@ public class VMManager {
     }
 
     public static void showChangeRemovableDevicesDialog(Activity _activity, VncCanvasActivity vncCanvasActivity) {
+        new Thread(() -> {
+            String allDevice = getAllDevicesInQemu();
 
-        String allDevice = getAllDevicesInQemu();
+            _activity.runOnUiThread(() -> {
+                View _view = LayoutInflater.from(_activity).inflate(R.layout.dialog_change_removable_devices, null);
+                AlertDialog _dialog = new MaterialAlertDialogBuilder(_activity, R.style.CenteredDialogTheme)
+                        .setView(_view)
+                        .create();
 
-        View _view = LayoutInflater.from(_activity).inflate(R.layout.dialog_change_removable_devices, null);
-        AlertDialog _dialog = new MaterialAlertDialogBuilder(_activity, R.style.CenteredDialogTheme)
-                .setView(_view)
-                .create();
+                if (allDevice != null && (allDevice.contains("ide1-cd0")
+                        || allDevice.contains("ide2-cd0")
+                        || allDevice.contains("floppy0")
+                        || allDevice.contains("floppy1")
+                        || allDevice.contains("sd0"))) {
 
-        if (allDevice != null && (allDevice.contains("ide1-cd0")
-                || allDevice.contains("ide2-cd0")
-                || allDevice.contains("floppy0")
-                || allDevice.contains("floppy1")
-                || allDevice.contains("sd0"))) {
+                    if (allDevice.contains("ide1-cd0")
+                            || allDevice.contains("ide2-cd0")) {
 
-            if (allDevice.contains("ide1-cd0")
-                    || allDevice.contains("ide2-cd0")) {
+                        _view.findViewById(R.id.ln_cdrom).setOnClickListener(v -> {
+                            Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
+                            intent.addCategory(Intent.CATEGORY_OPENABLE);
+                            intent.setType("*/*");
+                            _activity.startActivityForResult(intent, 120);
+                            _dialog.dismiss();
+                        });
 
-                _view.findViewById(R.id.ln_cdrom).setOnClickListener(v -> {
-                    Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("*/*");
-                    _activity.startActivityForResult(intent, 120);
-                    _dialog.dismiss();
-                });
+                        _view.findViewById(R.id.iv_ejectcdrom).setOnClickListener(v -> {
+                            ejectCDROM(_activity);
+                            _dialog.dismiss();
+                        });
+                    } else {
+                        _view.findViewById(R.id.ln_cdrom).setVisibility(View.GONE);
+                    }
 
-                _view.findViewById(R.id.iv_ejectcdrom).setOnClickListener(v -> {
-                    ejectCDROM(_activity);
-                    _dialog.dismiss();
-                });
-            } else {
-                _view.findViewById(R.id.ln_cdrom).setVisibility(View.GONE);
-            }
+                    if (allDevice.contains("floppy0")) {
+                        _view.findViewById(R.id.ln_fda).setOnClickListener(v -> {
+                            Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
+                            intent.addCategory(Intent.CATEGORY_OPENABLE);
+                            intent.setType("*/*");
+                            _activity.startActivityForResult(intent, 889);
+                            _dialog.dismiss();
+                        });
 
-            if (allDevice.contains("floppy0")) {
-                _view.findViewById(R.id.ln_fda).setOnClickListener(v -> {
-                    Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("*/*");
-                    _activity.startActivityForResult(intent, 889);
-                    _dialog.dismiss();
-                });
+                        _view.findViewById(R.id.iv_ejectfda).setOnClickListener(v -> {
+                            ejectFloppyDriveA(_activity);
+                            _dialog.dismiss();
+                        });
 
-                _view.findViewById(R.id.iv_ejectfda).setOnClickListener(v -> {
-                    ejectFloppyDriveA(_activity);
-                    _dialog.dismiss();
-                });
+                        if (!allDevice.contains("floppy1")) {
+                            TextView tvFda = _view.findViewById(R.id.tv_fda);
+                            tvFda.setText(R.string.floppy_drive);
+                        }
+                    } else {
+                        _view.findViewById(R.id.ln_fda).setVisibility(View.GONE);
+                    }
 
-                if (!allDevice.contains("floppy1")) {
-                    TextView tvFda = _view.findViewById(R.id.tv_fda);
-                    tvFda.setText(R.string.floppy_drive);
+                    if (allDevice.contains("floppy1")) {
+                        _view.findViewById(R.id.ln_fdb).setOnClickListener(v -> {
+                            Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
+                            intent.addCategory(Intent.CATEGORY_OPENABLE);
+                            intent.setType("*/*");
+                            _activity.startActivityForResult(intent, 13335);
+                            _dialog.dismiss();
+                        });
+
+                        _view.findViewById(R.id.iv_ejectfdb).setOnClickListener(v -> {
+                            ejectFloppyDriveB(_activity);
+                            _dialog.dismiss();
+                        });
+
+                        if (!allDevice.contains("floppy0")) {
+                            TextView tvFdb = _view.findViewById(R.id.tv_fdb);
+                            tvFdb.setText(R.string.floppy_drive);
+                        }
+                    } else {
+                        _view.findViewById(R.id.ln_fdb).setVisibility(View.GONE);
+                    }
+
+                    if (allDevice.contains("sd0")) {
+                        _view.findViewById(R.id.ln_sd).setOnClickListener(v -> {
+                            Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
+                            intent.addCategory(Intent.CATEGORY_OPENABLE);
+                            intent.setType("*/*");
+                            _activity.startActivityForResult(intent, 32);
+                            _dialog.dismiss();
+                        });
+
+                        _view.findViewById(R.id.iv_ejectsd).setOnClickListener(v -> {
+                            ejectSDCard(_activity);
+                            _dialog.dismiss();
+                        });
+                    } else {
+                        _view.findViewById(R.id.ln_sd).setVisibility(View.GONE);
+                    }
+
+                    _view.findViewById(R.id.ln_otherdevice).setOnClickListener(v -> {
+                        showChangeRemovableDevicesWithIDDialog(_activity);
+                        _dialog.dismiss();
+                    });
+                } else {
+                    TextView tvFdb = _view.findViewById(R.id.tv_otherdevice);
+                    tvFdb.setText(R.string.change_or_eject_a_device);
+
+                    _view.findViewById(R.id.ln_cdrom).setVisibility(View.GONE);
+                    _view.findViewById(R.id.ln_fda).setVisibility(View.GONE);
+                    _view.findViewById(R.id.ln_fdb).setVisibility(View.GONE);
+                    _view.findViewById(R.id.ln_sd).setVisibility(View.GONE);
                 }
-            } else {
-                _view.findViewById(R.id.ln_fda).setVisibility(View.GONE);
-            }
 
-            if (allDevice.contains("floppy1")) {
-                _view.findViewById(R.id.ln_fdb).setOnClickListener(v -> {
-                    Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("*/*");
-                    _activity.startActivityForResult(intent, 13335);
-                    _dialog.dismiss();
-                });
+                if (vncCanvasActivity != null) {
+                    _view.findViewById(R.id.ln_refresh).setOnClickListener(v -> {
+                        _activity.startActivity(new Intent(_activity, MainVNCActivity.class));
+                        _activity.overridePendingTransition(0, 0);
+                        _activity.finish();
+                        _dialog.dismiss();
+                    });
 
-                _view.findViewById(R.id.iv_ejectfdb).setOnClickListener(v -> {
-                    ejectFloppyDriveB(_activity);
-                    _dialog.dismiss();
-                });
+                    _view.findViewById(R.id.ln_mouse).setOnClickListener(v -> {
+                        MainVNCActivity.getContext.onMouseMode();
+                        _dialog.dismiss();
+                    });
 
-                if (!allDevice.contains("floppy0")) {
-                    TextView tvFdb = _view.findViewById(R.id.tv_fdb);
-                    tvFdb.setText(R.string.floppy_drive);
+                    _view.findViewById(R.id.ln_settings).setOnClickListener(v -> {
+                        _activity.startActivity(new Intent(_activity, VNCSettingsActivity.class));
+                        _dialog.dismiss();
+                    });
+
+                    if (MainSettingsManager.getVNCScaleMode(_activity) == VNCConfig.oneToOne) {
+                        _view.findViewById(R.id.iv_screenOneToOne).setBackgroundResource(R.drawable.dialog_shape_single_button);
+                    } else {
+                        _view.findViewById(R.id.iv_screenFit).setBackgroundResource(R.drawable.dialog_shape_single_button);
+                    }
+
+                    _view.findViewById(R.id.iv_screenOneToOne).setOnClickListener(v -> {
+                        AbstractScaling.getById(R.id.itemOneToOne)
+                                .setScaleTypeForActivity(vncCanvasActivity);
+                        MainSettingsManager.setVNCScaleMode(_activity, VNCConfig.oneToOne);
+                        _dialog.dismiss();
+                    });
+
+                    _view.findViewById(R.id.iv_screenFit).setOnClickListener(v -> {
+                        AbstractScaling.getById(R.id.itemFitToScreen)
+                                .setScaleTypeForActivity(vncCanvasActivity);
+                        MainSettingsManager.setVNCScaleMode(_activity, VNCConfig.fitToScreen);
+                        _dialog.dismiss();
+                    });
+                } else {
+                    _view.findViewById(R.id.ln_user_interface).setVisibility(View.GONE);
                 }
-            } else {
-                _view.findViewById(R.id.ln_fdb).setVisibility(View.GONE);
-            }
 
-            if (allDevice.contains("sd0")) {
-                _view.findViewById(R.id.ln_sd).setOnClickListener(v -> {
-                    Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("*/*");
-                    _activity.startActivityForResult(intent, 32);
-                    _dialog.dismiss();
-                });
-
-                _view.findViewById(R.id.iv_ejectsd).setOnClickListener(v -> {
-                    ejectSDCard(_activity);
-                    _dialog.dismiss();
-                });
-            } else {
-                _view.findViewById(R.id.ln_sd).setVisibility(View.GONE);
-            }
-
-            _view.findViewById(R.id.ln_otherdevice).setOnClickListener(v -> {
-                showChangeRemovableDevicesWithIDDialog(_activity);
-                _dialog.dismiss();
+                _dialog.show();
             });
-        } else {
-            TextView tvFdb = _view.findViewById(R.id.tv_otherdevice);
-            tvFdb.setText(R.string.change_or_eject_a_device);
-
-            _view.findViewById(R.id.ln_cdrom).setVisibility(View.GONE);
-            _view.findViewById(R.id.ln_fda).setVisibility(View.GONE);
-            _view.findViewById(R.id.ln_fdb).setVisibility(View.GONE);
-            _view.findViewById(R.id.ln_sd).setVisibility(View.GONE);
-        }
-
-        if (vncCanvasActivity != null) {
-            _view.findViewById(R.id.ln_mouse).setOnClickListener(v -> {
-                MainVNCActivity.activity.onMouseMode();
-                _dialog.dismiss();
-            });
-
-            _view.findViewById(R.id.ln_settings).setOnClickListener(v -> {
-                _activity.startActivity(new Intent(_activity, VNCSettingsActivity.class));
-                _dialog.dismiss();
-            });
-
-            if (MainSettingsManager.getVNCScaleMode(_activity) == VNCConfig.oneToOne) {
-                _view.findViewById(R.id.iv_screenOneToOne).setBackgroundResource(R.drawable.dialog_shape_single_button);
-            } else {
-                _view.findViewById(R.id.iv_screenFit).setBackgroundResource(R.drawable.dialog_shape_single_button);
-            }
-
-            _view.findViewById(R.id.iv_screenOneToOne).setOnClickListener(v -> {
-                AbstractScaling.getById(R.id.itemOneToOne)
-                        .setScaleTypeForActivity(vncCanvasActivity);
-                MainSettingsManager.setVNCScaleMode(_activity, VNCConfig.oneToOne);
-                _dialog.dismiss();
-            });
-
-            _view.findViewById(R.id.iv_screenFit).setOnClickListener(v -> {
-                AbstractScaling.getById(R.id.itemFitToScreen)
-                        .setScaleTypeForActivity(vncCanvasActivity);
-                MainSettingsManager.setVNCScaleMode(_activity, VNCConfig.fitToScreen);
-                _dialog.dismiss();
-            });
-        } else {
-            _view.findViewById(R.id.ln_user_interface).setVisibility(View.GONE);
-        }
-
-        _dialog.show();
+        }).start();
     }
 
     public static void showChangeRemovableDevicesWithIDDialog(Activity _activity) {

@@ -39,8 +39,8 @@ public class LoggerFragment extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_logs, container, false);
         activity = getActivity();
-        LinearLayoutManager layoutManager = new LinearLayoutManager(VectrasApp.getApp());
-        mLogAdapter = new LogsAdapter(layoutManager, VectrasApp.getApp());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
+        mLogAdapter = new LogsAdapter(layoutManager, activity);
         logList = (RecyclerView) view.findViewById(R.id.recyclerLog);
         logList.setAdapter(mLogAdapter);
         logList.setLayoutManager(layoutManager);

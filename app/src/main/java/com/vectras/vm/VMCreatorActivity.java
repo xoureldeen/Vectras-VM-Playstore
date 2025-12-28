@@ -26,10 +26,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import com.vectras.qemu.MainSettingsManager;
 import com.vectras.vm.Fragment.CreateImageDialogFragment;
-import com.vectras.vm.MainRoms.DataMainRoms;
+import com.vectras.vm.main.vms.DataMainRoms;
 import com.vectras.vm.databinding.ActivityVmCreatorBinding;
 import com.vectras.vm.databinding.DialogProgressStyleBinding;
-import com.vectras.vm.home.HomeActivity;
+import com.vectras.vm.main.MainActivity;
 import com.vectras.vm.utils.DeviceUtils;
 import com.vectras.vm.utils.DialogUtils;
 import com.vectras.vm.utils.FileUtils;
@@ -562,16 +562,16 @@ public class VMCreatorActivity extends AppCompatActivity {
 
         if (getIntent().hasExtra("addromnow")) {
             RomInfo.isFinishNow = true;
-            HomeActivity.isOpenHome = true;
+            MainActivity.isOpenHome = true;
         }
 
         modify = false;
-        if (!HomeActivity.isActivate) {
+        if (!MainActivity.isActivate) {
             startActivity(new Intent(this, SplashActivity.class));
         } else {
             Intent intent = new Intent();
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            intent.setClass(this, HomeActivity.class);
+            intent.setClass(this, MainActivity.class);
             startActivity(intent);
         }
         finish();

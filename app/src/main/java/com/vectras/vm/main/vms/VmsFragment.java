@@ -1,4 +1,4 @@
-package com.vectras.vm.home.vms;
+package com.vectras.vm.main.vms;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -15,12 +15,11 @@ import android.view.ViewGroup;
 
 import com.google.android.material.transition.MaterialFadeThrough;
 import com.vectras.vm.AppConfig;
-import com.vectras.vm.MainRoms.DataMainRoms;
 import com.vectras.vm.R;
 import com.vectras.vm.VMManager;
 import com.vectras.vm.databinding.FragmentHomeVmsBinding;
-import com.vectras.vm.home.HomeActivity;
-import com.vectras.vm.home.core.CallbackInterface;
+import com.vectras.vm.main.MainActivity;
+import com.vectras.vm.main.core.CallbackInterface;
 import com.vectras.vm.utils.DeviceUtils;
 import com.vectras.vm.utils.DialogUtils;
 import com.vectras.vm.utils.FileUtils;
@@ -78,7 +77,7 @@ public class VmsFragment extends Fragment implements CallbackInterface.HomeCallT
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        HomeActivity.homeCallToVmsListener = this;
+        MainActivity.homeCallToVmsListener = this;
 
         binding.rvRomlist.setLayoutManager(new GridLayoutManager(getContext(), spanCount));
         vmsHomeAdapter = new VmsHomeAdapter(requireActivity(), data);
@@ -169,22 +168,27 @@ public class VmsFragment extends Fragment implements CallbackInterface.HomeCallT
     }
 
     private void checkAndLoad() {
+        if (!isAdded()) return;
         if (PermissionUtils.storagepermission(requireActivity(), true)) {
             loadDataVbi();
-            if (DeviceUtils.isStorageLow(requireActivity(), true)) {
-                DialogUtils.oneDialog(requireActivity(),
-                        getResources().getString(R.string.oops),
-                        getResources().getString(R.string.very_low_available_storage_space_content),
-                        getResources().getString(R.string.ok),
-                        true,
-                        R.drawable.warning_48px,
-                        true,
-                        null,
-                        () -> {
-                            if (DeviceUtils.isStorageLow(requireActivity(), true))
-                                requireActivity().finish();
-                        });
-            }
+            executor.execute(() -> {
+                if (!isAdded()) return;
+                if (DeviceUtils.isStorageLow(requireActivity(), true)) {
+                    if (!isAdded()) return;
+                    requireActivity().runOnUiThread(() -> DialogUtils.oneDialog(requireActivity(),
+                            getResources().getString(R.string.oops),
+                            getResources().getString(R.string.very_low_available_storage_space_content),
+                            getResources().getString(R.string.ok),
+                            true,
+                            R.drawable.warning_48px,
+                            true,
+                            null,
+                            () -> {
+                                if (DeviceUtils.isStorageLow(requireActivity(), true))
+                                    requireActivity().finish();
+                            }));
+                }
+            });
         }
     }
 

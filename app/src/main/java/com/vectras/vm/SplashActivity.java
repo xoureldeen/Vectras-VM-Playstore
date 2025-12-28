@@ -12,10 +12,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import com.vectras.qemu.MainSettingsManager;
-import com.vectras.vm.home.HomeActivity;
+import com.vectras.vm.crashtracker.LastCrashActivity;
+import com.vectras.vm.main.MainActivity;
 import com.vectras.vm.setupwizard.SetupFeatureCore;
 import com.vectras.vm.setupwizard.SetupWizard2Activity;
-import com.vectras.vm.setupwizard.SetupWizardActivity;
 import com.vectras.vm.utils.DeviceUtils;
 import com.vectras.vm.utils.FileUtils;
 import com.vectras.vm.utils.UIUtils;
@@ -127,8 +127,10 @@ public class SplashActivity extends AppCompatActivity implements Runnable {
 
     @Override
     public void run() {
-        if (SetupFeatureCore.isInstalledSystemFiles(this)) {
-            startActivity(new Intent(this, HomeActivity.class));
+        if (MainSettingsManager.getShowLastCrashLog(this)) {
+            startActivity(new Intent(this, LastCrashActivity.class));
+        } else if (SetupFeatureCore.isInstalledSystemFiles(this)) {
+            startActivity(new Intent(this, MainActivity.class));
         } else {
             startActivity(new Intent(this, SetupWizard2Activity.class));
             //For Android 14+

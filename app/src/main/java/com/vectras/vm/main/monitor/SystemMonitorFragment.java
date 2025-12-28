@@ -1,4 +1,4 @@
-package com.vectras.vm.home.monitor;
+package com.vectras.vm.main.monitor;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 import static android.os.Build.VERSION.SDK_INT;
@@ -203,8 +203,8 @@ public class SystemMonitorFragment extends Fragment {
         binding.tvQemuarch.setText(getString(R.string.arch) + " " + currentArch + ".");
 
         executor.execute(() -> {
-            if (!isAdded()) return;
             String qemuVersionName = CommandUtils.getQemuVersionName();
+            if (!isAdded()) return;
             String result = Terminal.executeShellCommandWithResult("ps -e command", requireContext());
             Activity activity = getActivity();
             if (activity != null) {

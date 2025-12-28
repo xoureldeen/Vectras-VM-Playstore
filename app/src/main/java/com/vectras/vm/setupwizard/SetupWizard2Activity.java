@@ -22,7 +22,7 @@ import com.vectras.vm.AppConfig;
 import com.vectras.vm.R;
 import com.vectras.vm.databinding.ActivitySetupWizard2Binding;
 import com.vectras.vm.databinding.SetupQemuDoneBinding;
-import com.vectras.vm.home.HomeActivity;
+import com.vectras.vm.main.MainActivity;
 import com.vectras.vm.utils.DeviceUtils;
 import com.vectras.vm.utils.FileUtils;
 import com.vectras.vm.utils.PermissionUtils;
@@ -135,7 +135,7 @@ public class SetupWizard2Activity extends AppCompatActivity {
                 Intent intent = new Intent(ACTION_VIEW, Uri.parse(AppConfig.patreonLink));
                 startActivity(intent);
             } else {
-                startActivity(new Intent(this, HomeActivity.class));
+                startActivity(new Intent(this, MainActivity.class));
                 finish();
             }
         });

@@ -1,4 +1,4 @@
-package com.vectras.vm.home.core;
+package com.vectras.vm.main.core;
 
 import static android.os.Build.VERSION.SDK_INT;
 
@@ -35,7 +35,7 @@ import com.vectras.vm.utils.ServiceUtils;
 
 import java.io.File;
 
-public class HomeStartVM {
+public class MainStartVM {
     public static final String TAG = "HomeStartVM";
     public static AlertDialog progressDialog;
     public static boolean skipIDEwithARM64DialogInStartVM = false;

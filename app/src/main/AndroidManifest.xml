@@ -50,6 +50,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".crashtracker.LastCrashActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
+            android:exported="false" />
+        <activity
             android:name=".setupwizard.SetupWizard2Activity"
             android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
             android:exported="false" />
@@ -66,10 +70,10 @@
             android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
             android:exported="false" />
         <activity
-            android:name=".home.HomeActivity"
+            android:name=".main.MainActivity"
             android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
             android:exported="true"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".settings.UpdaterActivity"
             android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
@@ -134,25 +138,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
-            android:exported="true"
-            android:hardwareAccelerated="true"
-            android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".setupwizard.SetupWizardActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
-            android:exported="false"
-            android:hardwareAccelerated="true"
-            tools:ignore="DiscouragedApi" /> <!-- stupid android issue -->
-        <activity
-            android:name=".RomStoreActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
-            android:exported="false"
-            android:hardwareAccelerated="true"
-            android:label="Roms"
-            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".AboutActivity"
             android:exported="true"

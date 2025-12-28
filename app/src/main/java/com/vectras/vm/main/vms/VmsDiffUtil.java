@@ -1,8 +1,6 @@
-package com.vectras.vm.home.vms;
+package com.vectras.vm.main.vms;
 
 import androidx.recyclerview.widget.DiffUtil;
-
-import com.vectras.vm.MainRoms.DataMainRoms;
 
 import java.util.List;
 

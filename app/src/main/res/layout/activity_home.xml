@@ -8,7 +8,7 @@
     android:keepScreenOn="true"
     android:background="?attr/colorSurface"
     tools:openDrawer="start"
-    tools:context=".home.HomeActivity" >
+    tools:context=".main.MainActivity" >
 
     <include
         android:id="@+id/maincontent"

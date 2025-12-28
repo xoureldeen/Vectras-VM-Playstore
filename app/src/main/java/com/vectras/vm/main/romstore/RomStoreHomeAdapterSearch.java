@@ -1,4 +1,4 @@
-package com.vectras.vm.home.romstore;
+package com.vectras.vm.main.romstore;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -16,19 +16,21 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.vectras.vm.R;
+
 import com.vectras.vm.RomInfo;
-import com.vectras.vm.Roms.DataRoms;
+import com.vectras.vm.R;
 
 import java.util.Collections;
 import java.util.List;
 
-public class RomStoreHomeAdpater extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class RomStoreHomeAdapterSearch extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
     Context context;
     private final LayoutInflater inflater;
     static List<DataRoms> dataRom = Collections.emptyList();
+    private final String TAG = "RomStoreHomeAdapterSearch";
 
-    public RomStoreHomeAdpater(Context context, List<DataRoms> data) {
+    public RomStoreHomeAdapterSearch(Context context, List<DataRoms> data) {
         this.context = context;
         inflater = LayoutInflater.from(context);
         dataRom = data;
@@ -81,20 +83,20 @@ public class RomStoreHomeAdpater extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
         if (dataRom.size() == 1) {
-            myHolder.linearItem.setBackground(AppCompatResources.getDrawable(context, R.drawable.object_shape_single));
+            myHolder.linearItem.setBackground(AppCompatResources.getDrawable(context, R.drawable.object_shape_single_on_surface));
         } else if (position == 0) {
-            myHolder.linearItem.setBackground(AppCompatResources.getDrawable(context, R.drawable.object_shape_top));
+            myHolder.linearItem.setBackground(AppCompatResources.getDrawable(context, R.drawable.object_shape_top_on_surface));
         } else if (position == dataRom.size() - 1) {
-            myHolder.linearItem.setBackground(AppCompatResources.getDrawable(context, R.drawable.object_shape_bottom));
+            myHolder.linearItem.setBackground(AppCompatResources.getDrawable(context, R.drawable.object_shape_bottom_on_surface));
         } else {
-            myHolder.linearItem.setBackground(AppCompatResources.getDrawable(context, R.drawable.object_shape_middle));
+            myHolder.linearItem.setBackground(AppCompatResources.getDrawable(context, R.drawable.object_shape_middle_on_surface));
         }
     }
 
     // return total item from List
     @Override
     public int getItemCount() {
-        return dataRom == null ? 0 : dataRom.size();
+        return dataRom.size();
     }
 
     static class MyHolder extends RecyclerView.ViewHolder {
@@ -115,4 +117,5 @@ public class RomStoreHomeAdpater extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
     }
+
 }

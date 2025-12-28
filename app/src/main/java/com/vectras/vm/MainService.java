@@ -51,9 +51,6 @@ public class MainService extends Service {
         if (env != null) {
             if (service != null) {
                 Terminal vterm = new Terminal(activity);
-//                if (Build.VERSION.SDK_INT < 34) {
-//                    vterm.executeShellCommand2("dwm", false, activity);
-//                }
                 vterm.executeShellCommand2(env, true, activity);
             }
         } else
@@ -112,9 +109,6 @@ public class MainService extends Service {
 
     public static void startCommand(String _env, Activity _activity) {
         Terminal vterm = new Terminal(_activity);
-//        if (Build.VERSION.SDK_INT < 34) {
-//            vterm.executeShellCommand2("dwm", false, _activity);
-//        }
         vterm.executeShellCommand2(_env, true, _activity);
     }
 }

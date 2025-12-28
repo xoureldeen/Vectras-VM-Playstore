@@ -1,4 +1,4 @@
-package com.vectras.vm.home.core;
+package com.vectras.vm.main.core;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,9 +8,9 @@ import android.widget.Button;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.vectras.vm.VMCreatorActivity;
 import com.vectras.vm.ExportRomActivity;
-import com.vectras.vm.MainRoms.DataMainRoms;
 import com.vectras.vm.R;
 import com.vectras.vm.VMManager;
+import com.vectras.vm.main.vms.DataMainRoms;
 
 import java.util.List;
 
@@ -42,6 +42,16 @@ public class RomOptionsDialog {
             VMManager.deleteVMDialog(vmName, position, activity);
             bottomSheetDialog.cancel();
         });
+
+        if (VMManager.isVMRunning(activity, vmID)) {
+            removeRomBtn.setVisibility(View.GONE);
+            Button deviceManagerBtn = v.findViewById(R.id.deviceManagerBtn);
+            deviceManagerBtn.setOnClickListener(v1 -> {
+                VMManager.showChangeRemovableDevicesDialog(activity, null);
+                bottomSheetDialog.cancel();
+            });
+            deviceManagerBtn.setVisibility(View.VISIBLE);
+        }
         bottomSheetDialog.show();
     }
 }

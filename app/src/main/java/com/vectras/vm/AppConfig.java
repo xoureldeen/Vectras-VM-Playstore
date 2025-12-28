@@ -73,6 +73,7 @@ public class AppConfig {
     public static String importedDriveFolder = maindirpath + "drive/";
     public static String cvbiFolder = maindirpath + "cvbi/";
     public static String pendingCommand = "";
+    public static String lastCrashLogPath = internalDataDirPath + "logs/lastcrash.txt";
 
     public static String neededPkgs = "bash aria2 tar dwm xfce4-terminal xterm libslirp libslirp-dev pulseaudio-dev glib-dev pixman-dev zlib-dev spice-dev" +
             " libusbredirparser usbredir-dev libiscsi-dev sdl2 sdl2-dev sdl2_image-dev libepoxy-dev virglrenderer-dev rdma-core" +

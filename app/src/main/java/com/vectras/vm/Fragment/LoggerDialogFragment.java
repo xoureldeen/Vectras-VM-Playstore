@@ -46,8 +46,8 @@ public class LoggerDialogFragment extends DialogFragment {
         alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         alertDialog.setContentView(R.layout.fragment_logs);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(VectrasApp.getApp());
-        mLogAdapter = new LogsAdapter(layoutManager, VectrasApp.getApp());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
+        mLogAdapter = new LogsAdapter(layoutManager, activity);
         logList = (RecyclerView) alertDialog.findViewById(R.id.recyclerLog);
         logList.setAdapter(mLogAdapter);
         logList.setLayoutManager(layoutManager);
